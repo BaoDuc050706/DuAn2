@@ -1,13 +1,9 @@
 <?php
+<?php
 
-namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 
-use Illuminate\Http\Request;
+Route::redirect('/', '/home');
 
-class HomeController extends Controller
-{
-    public function index()
-    {
-        return view('home');
-    }
-}
+Route::get('/home', [HomeController::class, 'index'])->name('home');

@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::redirect('/', '/home');
+
+Route::get('/home', function () {
     return view('home');
-});
+})->name('home');
