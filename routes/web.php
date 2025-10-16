@@ -17,3 +17,8 @@ Route::post('/checkout', [PaymentController::class, 'process'])->name('checkout.
 
 // Product detail
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
+
+// Category page (placeholder)
+Route::get('/category/{slug}', function (string $slug) {
+    return response()->view('welcome', [ 'slug' => $slug ]);
+})->name('category.show');

@@ -111,6 +111,22 @@
             font-weight: 600;
         }
         .category-btn i { font-size: 1.1rem; }
+        .category-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            background: #fff;
+            color: #111;
+            border: 1px solid #eee;
+            border-radius: .5rem;
+            box-shadow: 0 10px 24px rgba(0,0,0,.08);
+            min-width: 260px;
+            display: none;
+        }
+        .category-wrap:hover .category-dropdown { display: block; }
+        .category-item { padding: .65rem .9rem; display: flex; align-items: center; gap: .5rem; text-decoration: none; color: #222; }
+        .category-item:hover { background: #f6f7f8; }
         .search-wrap .form-control {
             border-radius: 2rem 0 0 2rem;
             border: none;
@@ -150,10 +166,21 @@
         {{-- TOP BAR --}}
         <div class="topbar">
             <div class="container py-2">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3 position-relative">
                     <a class="navbar-brand m-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">GearZone</span></a>
 
-                    <button class="category-btn d-none d-md-inline-flex"><i class="bi bi-list"></i> Danh mục</button>
+                    <div class="category-wrap d-none d-md-inline-block">
+                        <button class="category-btn"><i class="bi bi-list"></i> Danh mục</button>
+                        <div class="category-dropdown mt-2">
+                            @forelse(($featuredCategories ?? collect()) as $cat)
+                                <a class="category-item" href="{{ url('/category/' . $cat->slug) }}">
+                                    <i class="bi bi-tag"></i> <span>{{ $cat->name }}</span>
+                                </a>
+                            @empty
+                                <div class="p-3 text-muted small">Chưa có danh mục</div>
+                            @endforelse
+                        </div>
+                    </div>
 
                     <form class="ms-0 ms-md-2 flex-grow-1 search-wrap d-none d-md-flex" role="search">
                         <input class="form-control" type="search" placeholder="Bạn cần tìm gì?">
