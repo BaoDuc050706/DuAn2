@@ -5,9 +5,7 @@
 @section('content')
 <div class="row g-4">
     <div class="col-lg-7">
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+        
 
         <div class="card">
             <div class="card-header bg-dark text-white">Thông tin giao hàng</div>
@@ -16,7 +14,7 @@
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Họ và tên</label>
-                        <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}">
+                        <input type="text" name="full_name" class="form-control" value="{{ old('full_name', auth()->check() ? auth()->user()->name : '') }}">
                         @error('full_name')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
@@ -24,14 +22,14 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email') }}">
+                            <input type="email" name="email" class="form-control" value="{{ old('email', auth()->check() ? auth()->user()->email : '') }}">
                             @error('email')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Số điện thoại</label>
-                            <input type="text" name="phone" class="form-control" value="{{ old('phone') }}">
+                            <input type="text" name="phone" class="form-control" value="{{ old('phone', auth()->check() ? auth()->user()->phone : '') }}">
                             @error('phone')
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
@@ -39,7 +37,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Địa chỉ</label>
-                        <textarea name="address" rows="3" class="form-control">{{ old('address') }}</textarea>
+                        <textarea name="address" rows="3" class="form-control">{{ old('address', auth()->check() ? auth()->user()->address : '') }}</textarea>
                         @error('address')
                             <div class="text-danger small">{{ $message }}</div>
                         @enderror
