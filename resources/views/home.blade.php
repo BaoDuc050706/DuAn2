@@ -66,13 +66,13 @@
                         <div class="d-flex gap-2 mt-auto">
                             <form method="post" action="{{ route('cart.add') }}" class="add-to-cart-form">
                                 @csrf
-                                <input type="hidden" name="name" value="{{ $product['name'] }}">
-                                <input type="hidden" name="price" value="{{ $product['price'] }}">
+                                <input type="hidden" name="name" value="{{ $product->name }}">
+                                <input type="hidden" name="price" value="{{ $product->price }}">
                                 <input type="hidden" name="qty" value="1">
-                                <input type="hidden" name="slug" value="{{ $product['slug'] }}">
+                                <input type="hidden" name="slug" value="{{ $product->slug }}">
                                 <button class="btn btn-outline-dark" type="submit">Thêm vào giỏ hàng</button>
                             </form>
-                            <a class="btn btn-danger" href="{{ route('checkout.index', ['buy_now' => 1, 'name' => $product['name'], 'price' => $product['price'], 'qty' => 1]) }}">Mua ngay</a>
+                            <a class="btn btn-danger" href="{{ route('checkout.index', ['buy_now' => 1, 'name' => $product->name, 'price' => $product->price, 'qty' => 1]) }}">Mua ngay</a>
                         </div>
                     </div>
                 </div>
