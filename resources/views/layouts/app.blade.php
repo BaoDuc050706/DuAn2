@@ -23,7 +23,19 @@
         }
         header .navbar-brand {
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 2rem;
+            letter-spacing: .3px;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        header .navbar-brand .brand-icon {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        header .navbar-brand .brand-text {
+            font-size: 2rem;
+            line-height: 1;
         }
         header .nav-link {
             color: #ddd !important;
@@ -54,31 +66,122 @@
             background: #ff4c00;
             color: white;
         }
+
+        /* Global UI polish */
+        .hero {
+            background: linear-gradient(135deg, #1b1b1b 0%, #2a2a2a 60%, #111 100%);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .hero .badge {
+            background: #ff4c00;
+        }
+        .product-card {
+            transition: transform .15s ease, box-shadow .15s ease;
+            border: 1px solid #eee;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0,0,0,.08);
+        }
+        .product-card .price {
+            color: #e53935;
+            font-weight: 700;
+        }
+        .section-title {
+            font-weight: 700;
+        }
+
+        /* Header like reference */
+        .topbar {
+            background: #d71920; /* red */
+        }
+        .topbar .navbar-brand {
+            color: #fff !important;
+        }
+        .category-btn {
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.2);
+            padding: .5rem .9rem;
+            border-radius: .5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-weight: 600;
+        }
+        .category-btn i { font-size: 1.1rem; }
+        .search-wrap .form-control {
+            border-radius: 2rem 0 0 2rem;
+            border: none;
+        }
+        .search-wrap .btn {
+            border-radius: 0 2rem 2rem 0;
+        }
+        .info-item {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            color: #fff;
+            white-space: nowrap;
+        }
+        .info-item .label { opacity: .9; font-size: .9rem; line-height: 1; }
+        .info-item .value { font-weight: 700; line-height: 1; }
+
+        .subbar {
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+        }
+        .quick-item {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .6rem .8rem;
+            color: #444;
+            font-size: .95rem;
+        }
     </style>
 </head>
-<body>
+<body
 
     {{-- HEADER --}}
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark px-3 py-2">
-            <a class="navbar-brand" href="/">🖥️ GearZone</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        {{-- TOP BAR --}}
+        <div class="topbar">
+            <div class="container py-2">
+                <div class="d-flex align-items-center gap-3">
+                    <a class="navbar-brand m-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">GearZone</span></a>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto me-3">
-                    <li class="nav-item"><a class="nav-link" href="/home">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/products">Sản phẩm</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/news">Tin tức</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact">Liên hệ</a></li>
-                </ul>
-                <form class="d-flex search-bar">
-                    <input class="form-control" type="search" placeholder="Tìm kiếm gear, laptop, phụ kiện..." aria-label="Search">
-                    <button class="btn" type="submit"><i class="bi bi-search"></i></button>
-                </form>
+                    <button class="category-btn d-none d-md-inline-flex"><i class="bi bi-list"></i> Danh mục</button>
+
+                    <form class="ms-0 ms-md-2 flex-grow-1 search-wrap d-none d-md-flex" role="search">
+                        <input class="form-control" type="search" placeholder="Bạn cần tìm gì?">
+                        <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+
+                    <div class="ms-auto d-none d-lg-flex align-items-center gap-4">
+                        <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
+                        <div class="info-item"><i class="bi bi-geo-alt"></i> <span class="label">Hệ thống</span> <span class="value">Showroom</span></div>
+                        <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></div>
+                        <a href="#" class="info-item text-decoration-none"><i class="bi bi-cart"></i> <span class="value">Giỏ hàng</span></a>
+                        <a href="#" class="info-item text-decoration-none"><i class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
+                    </div>
+                </div>
             </div>
-        </nav>
+        </div>
+
+        {{-- SUB BAR --}}
+        <div class="subbar">
+            <div class="container d-flex flex-wrap gap-3 py-2">
+                <span class="quick-item"><i class="bi bi-bag-check"></i> Mua PC tặng màn 240Hz</span>
+                <span class="quick-item"><i class="bi bi-fire"></i> Hot Deal</span>
+                <span class="quick-item"><i class="bi bi-laptop"></i> Laptop</span>
+                <span class="quick-item"><i class="bi bi-gear"></i> Dịch vụ kỹ thuật tại nhà</span>
+                <span class="quick-item"><i class="bi bi-arrow-left-right"></i> Thu cũ đổi mới</span>
+                <span class="quick-item"><i class="bi bi-shield-check"></i> Tra cứu bảo hành</span>
+            </div>
+        </div>
     </header>
 
     {{-- CONTENT --}}
