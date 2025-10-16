@@ -2,11 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ProductController;
-
+<<<<<<<<< Temporary merge branch 1
+=========
 Route::redirect('/', '/home');
 
+>>>>>>>>> Temporary merge branch 2
 Route::get('/home', function () {
     return view('home');
 })->name('home');
