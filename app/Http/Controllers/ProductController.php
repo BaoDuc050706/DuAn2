@@ -33,7 +33,13 @@ class ProductController extends Controller
                 'price' => 4999000,
                 'image' => 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop',
                 'description' => 'Màn hình gaming 27 inch, 144Hz, thời gian phản hồi nhanh.',
-            ],
+                'man-hinh-27-144hz' => [
+                    'name' => 'Màn hình 27" 144Hz',
+                    'price' => 4999000,
+                    'image' => 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop',
+                    'description' => 'Màn hình gaming 27 inch, 144Hz, thời gian phản hồi nhanh.',
+                ],
+            ]
         ];
 
         $product = $catalog[$slug] ?? null;
