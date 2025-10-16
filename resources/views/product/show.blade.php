@@ -5,7 +5,7 @@
 @section('content')
 <div class="row g-4">
     <div class="col-md-6">
-        <img src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="img-fluid rounded shadow-sm">
+        <img id="productMainImg" src="{{ $product['image'] }}" alt="{{ $product['name'] }}" class="img-fluid rounded shadow-sm">
     </div>
     <div class="col-md-6">
         <h1 class="h3 mb-3">{{ $product['name'] }}</h1>
@@ -13,10 +13,14 @@
         <p class="text-muted">{{ $product['description'] }}</p>
 
         <div class="d-flex gap-2 mt-4">
-            <form method="post" action="#" onsubmit="event.preventDefault(); alert('Đã thêm vào giỏ (demo)');">
+            <form method="post" action="{{ route('cart.add') }}" class="add-to-cart-form" data-img="#productMainImg">
                 @csrf
-                <button class="btn btn-dark">
-                    <i class="bi bi-cart-plus"></i> Đặt hàng
+                <input type="hidden" name="name" value="{{ $product['name'] }}">
+                <input type="hidden" name="price" value="{{ $product['price'] }}">
+                <input type="hidden" name="qty" value="1">
+                <input type="hidden" name="slug" value="{{ $slug }}">
+                <button class="btn btn-dark" type="submit">
+                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
                 </button>
             </form>
 

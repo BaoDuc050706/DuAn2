@@ -92,6 +92,26 @@
             font-weight: 700;
         }
 
+        /* Fly to cart + toast */
+        .fly-img {
+            position: fixed;
+            z-index: 1055;
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.15);
+            transition: transform .6s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
+            pointer-events: none;
+        }
+        .toast-fixed {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 1060;
+            min-width: 260px;
+        }
+
         /* Header like reference */
         .topbar {
             background: #d71920; /* red */
@@ -164,8 +184,37 @@
                         <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
                         <div class="info-item"><i class="bi bi-geo-alt"></i> <span class="label">Hệ thống</span> <span class="value">Showroom</span></div>
                         <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></div>
-                        <a href="#" class="info-item text-decoration-none"><i class="bi bi-cart"></i> <span class="value">Giỏ hàng</span></a>
-                        <a href="#" class="info-item text-decoration-none"><i class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
+                        <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative" id="cartLink">
+                            <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
+                            @php
+                                $cart = session('cart', []);
+                                $cartQty = collect($cart)->sum('qty');
+                            @endphp
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
+                        </a>
+                        @auth
+                            <div class="dropdown">
+                                <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> <span class="value">{{ auth()->user()->name }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
+                                    <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                            @csrf
+                                            <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        @else
+                            <a href="{{ route('login') }}" class="info-item text-decoration-none"><i class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -186,6 +235,13 @@
 
     {{-- CONTENT --}}
     <main class="container mt-4">
+        @php $flashSuccess = session()->pull('success'); $flashError = session()->pull('error'); @endphp
+        @if ($flashSuccess)
+            <div class="alert alert-success">{{ $flashSuccess }}</div>
+        @endif
+        @if ($flashError)
+            <div class="alert alert-danger">{{ $flashError }}</div>
+        @endif
         @yield('content')
     </main>
 
@@ -228,5 +284,73 @@
 
     {{-- JS Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function(){
+            const badge = document.getElementById('cartQtyBadge');
+            const cartIcon = document.getElementById('cartIcon');
+
+            function showToast(message) {
+                const wrap = document.createElement('div');
+                wrap.className = 'toast-fixed alert alert-success shadow';
+                wrap.textContent = message;
+                document.body.appendChild(wrap);
+                setTimeout(() => { wrap.remove(); }, 3000);
+            }
+
+            function updateBadge(byQty) {
+                if (!badge) return;
+                const current = parseInt(badge.textContent || '0', 10) || 0;
+                const next = Math.max(0, current + byQty);
+                badge.textContent = String(next);
+                badge.classList.toggle('d-none', next === 0);
+            }
+
+            function flyToCart(fromImg) {
+                if (!fromImg || !cartIcon) return;
+                const imgRect = fromImg.getBoundingClientRect();
+                const cartRect = cartIcon.getBoundingClientRect();
+                const clone = document.createElement('img');
+                clone.src = fromImg.src;
+                clone.className = 'fly-img';
+                clone.style.left = imgRect.left + 'px';
+                clone.style.top = imgRect.top + 'px';
+                document.body.appendChild(clone);
+                const dx = cartRect.left - imgRect.left;
+                const dy = cartRect.top - imgRect.top;
+                requestAnimationFrame(() => {
+                    clone.style.transform = `translate(${dx}px, ${dy}px) scale(.2)`;
+                    clone.style.opacity = '0.2';
+                });
+                setTimeout(() => clone.remove(), 650);
+            }
+
+            function handleAddToCartSubmit(e){
+                const form = e.target.closest('form');
+                if (!form || !form.classList.contains('add-to-cart-form')) return;
+                e.preventDefault();
+                const action = form.getAttribute('action');
+                const formData = new FormData(form);
+                const qty = parseInt(formData.get('qty') || '1', 10) || 1;
+                const token = form.querySelector('input[name=_token]')?.value;
+                const fromImg = form.dataset.img ? document.querySelector(form.dataset.img) : form.closest('.product-card')?.querySelector('img');
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': token || ''
+                    },
+                    body: formData
+                }).then(() => {
+                    updateBadge(qty);
+                    flyToCart(fromImg);
+                    showToast('Đã thêm vào giỏ hàng');
+                }).catch(() => {
+                    showToast('Không thể thêm vào giỏ. Vui lòng thử lại.');
+                });
+            }
+
+            document.addEventListener('submit', handleAddToCartSubmit);
+        })();
+    </script>
 </body>
 </html>
