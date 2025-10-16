@@ -2,10 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-<<<<<<< HEAD
-<<<<<<<<< Temporary merge branch 1
-=========
-=======
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\LoginController;
@@ -13,10 +9,8 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 
->>>>>>> 577f0083dab6690302a81040931ef83fc8474bba
 Route::redirect('/', '/home');
 
->>>>>>>>> Temporary merge branch 2
 Route::get('/home', function () {
     return view('home');
 })->name('home');
@@ -30,12 +24,6 @@ Route::middleware('auth')->group(function () {
 // Product detail
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
 
-<<<<<<< HEAD
-// Category page (placeholder)
-Route::get('/category/{slug}', function (string $slug) {
-    return response()->view('welcome', [ 'slug' => $slug ]);
-})->name('category.show');
-=======
 // Auth - Login (demo)
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'submit'])->name('login.submit');
@@ -57,4 +45,3 @@ Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.re
 Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
 Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
->>>>>>> 577f0083dab6690302a81040931ef83fc8474bba
