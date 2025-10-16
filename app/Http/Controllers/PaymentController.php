@@ -67,7 +67,10 @@ class PaymentController extends Controller
 			$user->save();
 		}
 
-        return redirect()->route('home')
+		// Clear cart after successful order
+		$request->session()->forget('cart');
+
+		return redirect()->route('home')
             ->with('success', 'Đơn hàng của bạn đã đặt thành công! Mã đơn: #' . mt_rand(100000, 999999));
     }
 }
