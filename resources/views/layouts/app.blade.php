@@ -68,7 +68,7 @@
         .hero {
             background: linear-gradient(135deg, #1b1b1b 0%, #2a2a2a 60%, #111 100%);
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(255, 255, 255, 0.36);
         }
         .hero .badge {
             background: #ff4c00;
@@ -174,6 +174,59 @@
             color: #444;
             font-size: .95rem;
         }
+        /* === DARK MODE === */
+        .dark-mode body { background-color: #111; color: #ddd; }
+        .dark-mode header { background-color: #000; color: #fff; }
+        .dark-mode .subbar { background-color: #222; border-color: #333; }
+        .dark-mode footer { background-color: #000; color: #aaa; }
+        .dark-mode .product-card { background-color: #1a1a1a; border-color: #333; }
+        .dark-mode .product-card .price { color: #ff6b6b; }
+        .dark-mode .hero {
+            background: linear-gradient(135deg, #3a3a3a 0%, #1f1f1f 60%, #111 100%);
+            color: #fff;
+        }
+        .dark-mode .subbar {
+            background-color: #222;
+            border-color: #333;
+        }
+
+        .dark-mode .subbar .quick-item {
+            color: #fff; 
+        }
+
+        /* === DARK/LIGHT MODE SWITCH === */
+        .theme-switch { width: 60px; height: 30px; cursor: pointer; position: relative; display: inline-block; }
+        .theme-switch .switch-track { width: 100%; height: 100%; background: #ccc; border-radius: 30px; position: relative; transition: background 0.3s; }
+        .theme-switch.dark-mode .switch-track { background: #555; }
+        .theme-switch .switch-thumb { width: 26px; height: 26px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; display: flex; align-items: center; justify-content: center; transition: left 0.3s, background 0.3s, color 0.3s; font-size: 14px; color: #333; }
+        .theme-switch.dark-mode .switch-thumb { left: 32px; background: #333; color: #ffd700; }
+    .categories-card {
+        background-color: #f8f9fa;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark-mode .categories-card {
+        background-color: #2a2a2a;
+        color: #fff;
+    }
+
+    /* Nút xem sản phẩm */
+    .categories-btn {
+        border: 1px solid #333;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .dark-mode .categories-btn {
+        border-color: #fff;
+        color: #fff;
+    }
+
+    .categories-btn:hover {
+        background-color: #ff4c00;
+        color: #fff;
+        border-color: #ff4c00;
+    }
     </style>
 </head>
 <body
@@ -216,10 +269,14 @@
                             @endphp
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
                         </a>
-                            <button id="theme-toggle" class="btn btn-sm btn-outline-light rounded-pill d-flex align-items-center gap-1">
-                                <i class="bi bi-moon"></i>
-                                <span class="theme-label"></span>
-                            </button>
+                            <!-- Toggle Dark/Light Mode Switch -->
+                            <div id="theme-toggle" class="theme-switch">
+                                <div class="switch-track">
+                                    <div class="switch-thumb">
+                                        <i class="bi bi-moon"></i>
+                                    </div>
+                                </div>
+                            </div>
                         @auth
                             <div class="dropdown">
                                 <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -380,5 +437,36 @@
             document.addEventListener('submit', handleAddToCartSubmit);
         })();
     </script>
+    <script>
+(function(){
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+    const html = document.documentElement;
+    const thumb = toggle.querySelector('.switch-thumb');
+
+    // Áp dụng theme khi load
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme === 'dark') {
+        html.classList.add('dark-mode');
+        toggle.classList.add('dark-mode');
+        thumb.innerHTML = '<i class="bi bi-sun"></i>';
+    } else {
+        thumb.innerHTML = '<i class="bi bi-moon"></i>';
+    }
+
+    toggle.addEventListener('click', () => {
+        const isDark = html.classList.toggle('dark-mode');
+        toggle.classList.toggle('dark-mode');
+        if (isDark) {
+            thumb.innerHTML = '<i class="bi bi-sun"></i>';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            thumb.innerHTML = '<i class="bi bi-moon"></i>';
+            localStorage.setItem('theme', 'light');
+        }
+    });
+})();
+</script>
+
 </body>
 </html>

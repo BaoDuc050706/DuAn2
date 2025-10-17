@@ -24,20 +24,20 @@
     {{-- Categories --}}
     @if(!empty($categories) && ($categories instanceof \Illuminate\Support\Collection ? $categories->isNotEmpty() : count($categories) > 0))
         <section class="mb-4">
-            <h2 class="h5 mb-3 section-title">Danh mục nổi bật</h2>
-            <div class="row g-3">
-                @foreach($categories as $cat)
-                    <div class="col-6 col-md-3">
-                        <div class="card h-100">
-                            <div class="card-body text-center">
-                                <div class="fw-semibold mb-2">{{ $cat->name }}</div>
-                                <a href="#" class="btn btn-sm btn-outline-dark">Xem sản phẩm</a>
-                            </div>
+        <h2 class="h5 mb-3 section-title">Danh mục nổi bật</h2>
+        <div class="row g-3">
+            @foreach($categories as $cat)
+                <div class="col-6 col-md-3">
+                    <div class="card h-100 categories-card">
+                        <div class="card-body text-center">
+                            <div class="fw-semibold mb-2">{{ $cat->name }}</div>
+                            <a href="#" class="btn btn-sm categories-btn">Xem sản phẩm</a>
                         </div>
                     </div>
-                @endforeach
-            </div>
-        </section>
+                </div>
+            @endforeach
+        </div>
+    </section>
     @endif
 
     {{-- Featured products --}}
