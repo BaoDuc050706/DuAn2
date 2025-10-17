@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Gear Store')</title>
 
-    {{-- CSS Bootstrap hoặc Tailwind (tùy bạn chọn) --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    {{-- Font + Icon --}}
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -219,6 +216,10 @@
                             @endphp
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
                         </a>
+                            <button id="theme-toggle" class="btn btn-sm btn-outline-light rounded-pill d-flex align-items-center gap-1">
+                                <i class="bi bi-moon"></i>
+                                <span class="theme-label"></span>
+                            </button>
                         @auth
                             <div class="dropdown">
                                 <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
