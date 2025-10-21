@@ -141,7 +141,6 @@
             min-width: 260px;
             display: none;
         }
-        .category-wrap:hover .category-dropdown { display: block; }
         .category-item { padding: .65rem .9rem; display: flex; align-items: center; gap: .5rem; text-decoration: none; color: #222; }
         .category-item:hover { background: #f6f7f8; }
         .search-wrap .form-control {
@@ -211,22 +210,32 @@
     }
 
     /* Nút xem sản phẩm */
-    .categories-btn {
-        border: 1px solid #333;
-        color: #333;
-        transition: all 0.3s;
-    }
+    .category-btn {
+    transition: transform 0.15s ease, background-color 0.2s ease;
+}
+.category-btn:hover {
+    transform: scale(1.05);           /* phóng to nhẹ */
+    background-color: rgba(255,255,255,0.2);  /* đổi màu nền nhẹ */
+}
 
-    .dark-mode .categories-btn {
-        border-color: #fff;
-        color: #fff;
-    }
+/* dropdown ẩn mặc định */
+.category-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    min-width: 260px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: .5rem;
+    box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
 
-    .categories-btn:hover {
-        background-color: #ff4c00;
-        color: #fff;
-        border-color: #ff4c00;
-    }
+/* dropdown xổ xuống khi click (toggle class active) */
+.category-wrap.active .category-dropdown {
+    display: block;
+}
     </style>
 </head>
 <body
@@ -239,9 +248,11 @@
                 <div class="d-flex align-items-center gap-3 position-relative">
                     <a class="navbar-brand m-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">GearZone</span></a>
 
-                    <div class="category-wrap d-none d-md-inline-block">
-                        <button class="category-btn"><i class="bi bi-list"></i> Danh mục</button>
-                        <div class="category-dropdown mt-2">
+                    <div class="category-wrap position-relative">
+                        <button class="category-btn" id="categoryToggle">
+                            <i class="bi bi-list"></i> Danh mục
+                        </button>
+                        <div class="category-dropdown mt-2" id="categoryDropdown">
                             @forelse(($featuredCategories ?? collect()) as $cat)
                                 <a class="category-item" href="{{ url('/category/' . $cat->slug) }}">
                                     <i class="bi bi-tag"></i> <span>{{ $cat->name }}</span>
@@ -251,7 +262,6 @@
                             @endforelse
                         </div>
                     </div>
-
                     <form class="ms-0 ms-md-2 flex-grow-1 search-wrap d-none d-md-flex" role="search">
                         <input class="form-control" type="search" placeholder="Bạn cần tìm gì?">
                         <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
@@ -466,6 +476,23 @@
         }
     });
 })();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const wrap = document.querySelector('.category-wrap');
+    const btn = document.getElementById('categoryToggle');
+
+    // click nút để mở/đóng dropdown
+    btn.addEventListener('click', function(e){
+        e.stopPropagation(); // tránh click ngoài đóng
+        wrap.classList.toggle('active');
+    });
+
+    // click ra ngoài đóng dropdown
+    document.addEventListener('click', function(){
+        wrap.classList.remove('active');
+    });
+});
 </script>
 
 </body>

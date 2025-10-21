@@ -9,7 +9,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\CategoryController;
 
 Route::redirect('/', '/home');
 
@@ -23,6 +23,8 @@ Route::middleware('auth')->group(function () {
 
 // Product detail
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');
+// Category page
+Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
 
 // Auth - Login (demo)
 Route::get('/login', [LoginController::class, 'show'])->name('login');
