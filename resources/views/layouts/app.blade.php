@@ -232,6 +232,7 @@
     box-shadow: 0 10px 24px rgba(0,0,0,.08);
 }
 
+
 /* dropdown xổ xuống khi click (toggle class active) */
 .category-wrap.active .category-dropdown {
     display: block;
@@ -247,6 +248,141 @@
 
 .topbar .info-item {
     white-space: nowrap;
+}
+/* ===========================
+   📱 Responsive cho Mobile
+   =========================== */
+@media (max-width: 768px) {
+    header .navbar-brand .brand-text {
+        font-size: 1.4rem;
+    }
+
+    .topbar .d-flex {
+        flex-wrap: wrap !important;
+        gap: .5rem;
+    }
+
+    /* Ẩn bớt phần lớn chỉ dành cho PC */
+    .topbar .info-item,
+    .search-wrap.d-none.d-md-flex {
+        display: none !important;
+    }
+
+    /* Danh mục chuyển thành 100% ngang màn hình */
+    .category-btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    /* Dropdown danh mục full chiều ngang */
+@media (max-width: 768px) {
+    .category-dropdown {
+        position: static !important;
+        transform: none !important;
+        min-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin-top: 0.25rem !important;
+        background: #fff;
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 10px 15px;
+        color: #333;
+    }
+
+    .category-item:hover {
+        background-color: #f2f2f2;
+    }
+}
+
+
+    /* Subbar cuộn ngang khi nhiều item */
+    .subbar .container {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .subbar .quick-item {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    /* Footer căn giữa đẹp hơn */
+    footer .row {
+        text-align: center;
+    }
+
+    /* Product card hoặc danh mục hiển thị 2 cột */
+    .product-card,
+    .categories-card {
+        margin-bottom: 1rem;
+    }
+
+    /* Giỏ hàng badge to hơn */
+    #cartQtyBadge {
+        transform: scale(1.2);
+    }
+}
+/* === MENU MOBILE CHUẨN HƠN === */
+@media (max-width: 768px) {
+    /* Giữ nút Danh mục luôn nổi bật và dễ bấm */
+    .category-wrap {
+        width: 100%;
+    }
+
+    .category-btn {
+        width: 100%;
+        justify-content: center;
+        background-color: #c5181e; /* đỏ đậm hơn một chút */
+        border-radius: .75rem;
+        color: #fff;
+    }
+
+    /* Khi mở dropdown thì danh mục nằm sát dưới, không bị lệch */
+    .category-dropdown {
+        position: static !important;
+        width: 100% !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background-color: #fff;
+        margin-top: .25rem !important;
+        display: none;
+    }
+
+    .category-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+        font-size: 1rem;
+    }
+
+    .category-item:last-child {
+        border-bottom: none;
+    }
+
+    .category-item i {
+        font-size: 1.2rem;
+        color: #d71920;
+    }
+
+    /* Subbar cho mobile cuộn ngang */
+    .subbar .container {
+        display: flex;
+        overflow-x: auto;
+        gap: .75rem;
+        scrollbar-width: none; /* ẩn scrollbar Firefox */
+    }
+
+    .subbar .container::-webkit-scrollbar {
+        display: none; /* ẩn scrollbar Chrome/Safari */
+    }
 }
 
     </style>
@@ -275,7 +411,16 @@
                             @endforelse
                         </div>
                     </div>
-                    <form class="ms-0 ms-md-2 flex-grow-1 search-wrap d-none d-md-flex" role="search">
+                                        <!-- Menu mobile -->
+                    <div class="d-flex d-lg-none align-items-center gap-3">
+                        <a href="{{ route('cart.index') }}" class="text-white fs-5">
+                            <i class="bi bi-cart"></i>
+                        </a>
+                        <a href="{{ route('login') }}" class="text-white fs-5">
+                            <i class="bi bi-person"></i>
+                        </a>
+                    </div>
+                    <form class="ms-0 ms-md-2 flex-grow-1 search-wrap" role="search">
                         <input class="form-control" type="search" placeholder="Bạn cần tìm gì?">
                         <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
                     </form>
