@@ -36,7 +36,7 @@ class HomeController extends Controller
         $categoryTable = $this->firstExistingTable(['categories', 'category', 'danh_muc', 'danhmuc']);
         if ($categoryTable !== null) {
             $categories = DB::table($categoryTable)
-                ->select(DB::raw("`name` as name"))
+                ->select(DB::raw('id, name, slug'))
                 ->orderBy('name')
                 ->limit(8)
                 ->get();

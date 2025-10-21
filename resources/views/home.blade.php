@@ -31,7 +31,7 @@
                     <div class="card h-100 categories-card">
                         <div class="card-body text-center">
                             <div class="fw-semibold mb-2">{{ $cat->name }}</div>
-                            <a href="#" class="btn btn-sm categories-btn">Xem sản phẩm</a>
+                            <a href="{{ route('category.show', $cat->slug) }}" class="btn btn-sm categories-btn">Xem sản phẩm</a>
                         </div>
                     </div>
                 </div>
