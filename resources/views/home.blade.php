@@ -8,7 +8,7 @@
     <section class="hero p-5 mb-4 rounded">
         <div class="container-fluid py-5">
             <span class="badge">HOT SALE</span>
-            <h1 class="display-6 fw-bold mt-2">Nâng tầm trải nghiệm gaming cùng GearZone</h1>
+            <h1 class="display-6 fw-bold mt-2">Nâng tầm trải nghiệm gaming cùng CAEKT</h1>
             <p class="col-md-8 fs-5 text-white-50">Ưu đãi phụ kiện gaming chính hãng. Giao nhanh, bảo hành 1 đổi 1.</p>
             <div class="d-flex gap-2">
                 <a href="/products" class="btn btn-danger btn-lg">

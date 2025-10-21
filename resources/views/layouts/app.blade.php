@@ -236,6 +236,19 @@
 .category-wrap.active .category-dropdown {
     display: block;
 }
+.topbar .d-flex {
+    flex-wrap: nowrap !important;
+}
+
+.topbar .search-wrap {
+    flex: 1 1 auto;
+    min-width: 300px;
+}
+
+.topbar .info-item {
+    white-space: nowrap;
+}
+
     </style>
 </head>
 <body
@@ -245,8 +258,8 @@
         {{-- TOP BAR --}}
         <div class="topbar">
             <div class="container py-2">
-                <div class="d-flex align-items-center gap-3 position-relative">
-                    <a class="navbar-brand m-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">GearZone</span></a>
+                <div class="d-flex align-items-center justify-content-between flex-nowrap position-relative w-100">
+                    <a class="navbar-brand m-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">CAEKT</span></a>
 
                     <div class="category-wrap position-relative">
                         <button class="category-btn" id="categoryToggle">
@@ -269,7 +282,6 @@
 
                     <div class="ms-auto d-none d-lg-flex align-items-center gap-4">
                         <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
-                        <div class="info-item"><i class="bi bi-geo-alt"></i> <span class="label">Hệ thống</span> <span class="value">Showroom</span></div>
                         <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></div>
                         <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative" id="cartLink">
                             <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
@@ -345,7 +357,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <h5>GearZone</h5>
+                    <h5>CAEKT</h5>
                     <p>Chuyên cung cấp PC, laptop gaming và linh kiện chính hãng với giá tốt nhất.</p>
                 </div>
                 <div class="col-md-3 mb-3">
