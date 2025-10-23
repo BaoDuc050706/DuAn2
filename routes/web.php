@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SearchController;
 
 Route::redirect('/', '/home');
 
@@ -47,3 +48,5 @@ Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.re
 Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
 Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+// Search
+Route::get('/search', [SearchController::class, 'index'])->name('search');

@@ -138,10 +138,26 @@
             border: 1px solid #eee;
             border-radius: .5rem;
             box-shadow: 0 10px 24px rgba(0,0,0,.08);
-            min-width: 260px;
+            min-width: 320px;
+            width: auto;
             display: none;
         }
-        .category-item { padding: .65rem .9rem; display: flex; align-items: center; gap: .5rem; text-decoration: none; color: #222; }
+        .category-item { 
+            padding: 12px 16px 12px 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start;
+            gap: 0.5rem; 
+            text-decoration: none; 
+            color: #222; 
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        .category-item i {
+            font-size: 1rem;
+            color: #d71920;
+        }
         .category-item:hover { background: #f6f7f8; }
         .search-wrap .form-control {
             border-radius: 2rem 0 0 2rem;
@@ -220,17 +236,18 @@
 
 /* dropdown ẩn mặc định */
 .category-dropdown {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    min-width: 260px;
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: .5rem;
-    box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    position: fixed !important;
+    top: 60px !important; /* đúng dưới header */
+    left: 0 !important;
+    width: 100vw !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2) !important;
+    background: #fff !important;
+    z-index: 2000;
 }
+
+
 
 
 /* dropdown xổ xuống khi click (toggle class active) */
@@ -243,16 +260,26 @@
 
 .topbar .search-wrap {
     flex: 1 1 auto;
-    min-width: 300px;
+    min-width: 200px;
+    max-width: 500px;
+}
+
+.topbar .search-wrap .input-group {
+    width: 100%;
 }
 
 .topbar .info-item {
     white-space: nowrap;
 }
+
+.topbar .flex-shrink-0 {
+    flex-shrink: 0;
+}
 /* ===========================
    📱 Responsive cho Mobile
    =========================== */
 @media (max-width: 768px) {
+
     header .navbar-brand .brand-text {
         font-size: 1.4rem;
     }
@@ -262,46 +289,83 @@
         gap: .5rem;
     }
 
-    /* Ẩn bớt phần lớn chỉ dành cho PC */
-    .topbar .info-item,
-    .search-wrap.d-none.d-md-flex {
-        display: none !important;
+    /* Mobile layout: Logo và Category trên cùng */
+    .topbar .navbar-brand {
+        order: 1;
+        flex: 0 0 auto;
     }
 
-    /* Danh mục chuyển thành 100% ngang màn hình */
+    .topbar .category-wrap {
+        order: 2;
+        flex: 0 0 auto;
+    }
+
+    /* Search bar trên dòng thứ 2 */
+    .topbar .search-wrap {
+        order: 3;
+        flex: 1 1 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* Right side items trên dòng thứ 2 */
+    .topbar .d-flex > div:last-child {
+        order: 4;
+        flex: 0 0 auto;
+    }
+
+    /* Danh mục trên mobile chỉ hiển thị icon 3 gạch */
     .category-btn {
-        width: 100%;
+        width: auto;
+        min-width: 44px;
         justify-content: center;
         font-size: 1rem;
+        padding: 0.5rem;
     }
 
-    /* Dropdown danh mục full chiều ngang */
-@media (max-width: 768px) {
-    .category-dropdown {
-        position: static !important;
-        transform: none !important;
-        min-width: 100% !important;
-        width: 100% !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        border: none !important;
-        margin-top: 0.25rem !important;
-        background: #fff;
+    .category-btn .bi-list {
+        font-size: 1.2rem;
     }
+
+
+    /* Dropdown danh mục không kéo header xuống */
+    @media (max-width: 768px) {
+    .category-dropdown {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        left: auto !important;
+        width: max-content !important; /* ✅ chỉ vừa đủ chữ */
+        min-width: 180px !important;   /* đảm bảo không quá hẹp */
+        background: #fff !important;
+        border: 1px solid #eee !important;
+        border-radius: 8px !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+        z-index: 2000 !important;
+    }
+}
 
     .category-item {
         display: flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 0.5rem;
-        padding: 10px 15px;
+        padding: 12px 16px 12px 20px;
         color: #333;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+    }
+
+    .category-item i {
+        font-size: 1rem;
+        color: #d71920;
     }
 
     .category-item:hover {
         background-color: #f2f2f2;
     }
-}
-
 
     /* Subbar cuộn ngang khi nhiều item */
     .subbar .container {
@@ -330,60 +394,6 @@
         transform: scale(1.2);
     }
 }
-/* === MENU MOBILE CHUẨN HƠN === */
-@media (max-width: 768px) {
-    /* Giữ nút Danh mục luôn nổi bật và dễ bấm */
-    .category-wrap {
-        width: 100%;
-    }
-
-    .category-btn {
-        width: 100%;
-        justify-content: center;
-        background-color: #c5181e; /* đỏ đậm hơn một chút */
-        border-radius: .75rem;
-        color: #fff;
-    }
-
-    /* Khi mở dropdown thì danh mục nằm sát dưới, không bị lệch */
-    .category-dropdown {
-        position: static !important;
-        width: 100% !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        background-color: #fff;
-        margin-top: .25rem !important;
-        display: none;
-    }
-
-    .category-item {
-        padding: 12px 16px;
-        border-bottom: 1px solid #eee;
-        font-size: 1rem;
-    }
-
-    .category-item:last-child {
-        border-bottom: none;
-    }
-
-    .category-item i {
-        font-size: 1.2rem;
-        color: #d71920;
-    }
-
-    /* Subbar cho mobile cuộn ngang */
-    .subbar .container {
-        display: flex;
-        overflow-x: auto;
-        gap: .75rem;
-        scrollbar-width: none; /* ẩn scrollbar Firefox */
-    }
-
-    .subbar .container::-webkit-scrollbar {
-        display: none; /* ẩn scrollbar Chrome/Safari */
-    }
-}
 
     </style>
 </head>
@@ -395,11 +405,13 @@
         <div class="topbar">
             <div class="container py-2">
                 <div class="d-flex align-items-center justify-content-between flex-nowrap position-relative w-100">
-                    <a class="navbar-brand m-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">CAEKT</span></a>
+                    <!-- Logo -->
+                    <a class="navbar-brand m-0 flex-shrink-0" href="/"><span class="brand-icon">🖥️</span><span class="brand-text">CAEKT</span></a>
 
-                    <div class="category-wrap position-relative">
+                    <!-- Category Button -->
+                    <div class="category-wrap position-relative flex-shrink-0">
                         <button class="category-btn" id="categoryToggle">
-                            <i class="bi bi-list"></i> Danh mục
+                            <i class="bi bi-list"></i> <span class="d-none d-md-inline">Danh mục</span>
                         </button>
                         <div class="category-dropdown mt-2" id="categoryDropdown">
                             @forelse(($featuredCategories ?? collect()) as $cat)
@@ -411,31 +423,39 @@
                             @endforelse
                         </div>
                     </div>
-                                        <!-- Menu mobile -->
-                    <div class="d-flex d-lg-none align-items-center gap-3">
-                        <a href="{{ route('cart.index') }}" class="text-white fs-5">
-                            <i class="bi bi-cart"></i>
-                        </a>
-                        <a href="{{ route('login') }}" class="text-white fs-5">
-                            <i class="bi bi-person"></i>
-                        </a>
-                    </div>
-                    <form class="ms-0 ms-md-2 flex-grow-1 search-wrap" role="search">
-                        <input class="form-control" type="search" placeholder="Bạn cần tìm gì?">
-                        <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
+
+                    <!-- Search Form -->
+                    <form action="{{ route('search') }}" method="GET" class="search-wrap flex-grow-1 mx-3" role="search">
+                        <div class="input-group">
+                            <input name="q" class="form-control" type="search" placeholder="Bạn cần tìm gì?" value="{{ request('q') }}">
+                            <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
                     </form>
 
-                    <div class="ms-auto d-none d-lg-flex align-items-center gap-4">
-                        <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
-                        <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></div>
-                        <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative" id="cartLink">
-                            <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
-                            @php
-                                $cart = session('cart', []);
-                                $cartQty = collect($cart)->sum('qty');
-                            @endphp
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
-                        </a>
+                    <!-- Right Side Items -->
+                    <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                        <!-- Mobile Menu -->
+                        <div class="d-flex d-lg-none align-items-center gap-3">
+                            <a href="{{ route('cart.index') }}" class="text-white fs-5">
+                                <i class="bi bi-cart"></i>
+                            </a>
+                            <a href="{{ route('login') }}" class="text-white fs-5">
+                                <i class="bi bi-person"></i>
+                            </a>
+                        </div>
+
+                        <!-- Desktop Menu -->
+                        <div class="d-none d-lg-flex align-items-center gap-4">
+                            <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
+                            <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></div>
+                            <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative" id="cartLink">
+                                <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
+                                @php
+                                    $cart = session('cart', []);
+                                    $cartQty = collect($cart)->sum('qty');
+                                @endphp
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
+                            </a>
                             <!-- Toggle Dark/Light Mode Switch -->
                             <div id="theme-toggle" class="theme-switch">
                                 <div class="switch-track">
@@ -444,29 +464,30 @@
                                     </div>
                                 </div>
                             </div>
-                        @auth
-                            <div class="dropdown">
-                                <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i> <span class="value">{{ auth()->user()->name }}</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
-                                    <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
-                                            @csrf
-                                            <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        @else
-                            <a href="{{ route('login') }}" class="info-item text-decoration-none"><i class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
-                        @endauth
+                            @auth
+                                <div class="dropdown">
+                                    <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle"></i> <span class="value">{{ auth()->user()->name }}</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
+                                        <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                                @csrf
+                                                <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @else
+                                <a href="{{ route('login') }}" class="info-item text-decoration-none"><i class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
+                            @endauth
+                        </div>
                     </div>
                 </div>
             </div>
