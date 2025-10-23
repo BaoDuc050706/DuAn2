@@ -444,7 +444,6 @@
                         </div>
                     </form>
 
-<<<<<<< HEAD
                     <div class="ms-auto d-none d-lg-flex align-items-center gap-4">
                         <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
                         <a href="{{ route('orders.lookup') }}" class="info-item text-decoration-none"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></a>
@@ -456,7 +455,6 @@
                             @endphp
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
                         </a>
-=======
                     <!-- Right Side Items -->
                     <div class="d-flex align-items-center gap-3 flex-shrink-0">
                         <!-- Mobile Menu -->
@@ -481,7 +479,6 @@
                                 @endphp
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}" id="cartQtyBadge">{{ $cartQty }}</span>
                             </a>
->>>>>>> 4c28312cebc6ecd8b68c8d69f5537807bb98c68d
                             <!-- Toggle Dark/Light Mode Switch -->
                             <div id="theme-toggle" class="theme-switch">
                                 <div class="switch-track">
