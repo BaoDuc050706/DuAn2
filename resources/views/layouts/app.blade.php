@@ -245,9 +245,21 @@
     min-width: 300px;
 }
 
-.topbar .info-item {
+    .topbar .info-item {
     white-space: nowrap;
 }
+
+    /* Style cho link hiển thị tất cả sản phẩm */
+    .show-all-link {
+        transition: color 0.2s ease;
+    }
+    .show-all-link:hover {
+        color: #007bff !important;
+    }
+    .show-all-link:hover i {
+        transform: translateX(3px);
+        transition: transform 0.2s ease;
+    }
 
     </style>
 </head>
@@ -282,7 +294,7 @@
 
                     <div class="ms-auto d-none d-lg-flex align-items-center gap-4">
                         <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span class="value">1900.5301</span></div>
-                        <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></div>
+                        <a href="{{ route('orders.lookup') }}" class="info-item text-decoration-none"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn hàng</span></a>
                         <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative" id="cartLink">
                             <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
                             @php
@@ -332,7 +344,7 @@
             <div class="container d-flex flex-wrap gap-3 py-2">
                 <span class="quick-item"><i class="bi bi-bag-check"></i> Mua PC tặng màn 240Hz</span>
                 <span class="quick-item"><i class="bi bi-fire"></i> Hot Deal</span>
-                <span class="quick-item"><i class="bi bi-laptop"></i> Laptop</span>
+                <a href="{{ route('home', ['category' => 'laptop']) }}" class="quick-item text-decoration-none"><i class="bi bi-laptop"></i> Laptop</a>
                 <span class="quick-item"><i class="bi bi-gear"></i> Dịch vụ kỹ thuật tại nhà</span>
                 <span class="quick-item"><i class="bi bi-arrow-left-right"></i> Thu cũ đổi mới</span>
                 <span class="quick-item"><i class="bi bi-shield-check"></i> Tra cứu bảo hành</span>

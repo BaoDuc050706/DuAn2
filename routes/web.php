@@ -19,7 +19,12 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [PaymentController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [PaymentController::class, 'process'])->name('checkout.process');
+    // Order history
+    Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
 });
+
+// Public order lookup (no auth) - searches session-stored orders
+Route::get('/orders/lookup', [\App\Http\Controllers\OrderController::class, 'lookup'])->name('orders.lookup');
 
 // Product detail
 Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product.show');

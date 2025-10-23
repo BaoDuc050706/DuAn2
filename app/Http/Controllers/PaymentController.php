@@ -67,11 +67,48 @@ class PaymentController extends Controller
 			$user->save();
 		}
 
+		// Build order record (session-backed). Prefer cart in session; fall back to single-item request params.
+		$cartItems = $request->session()->get('cart', []);
+		if (empty($cartItems) && $request->filled('name') && $request->filled('price')) {
+			// single item buy-now fallback
+			$cartItems = [[
+				'name' => $request->input('name'),
+				'price' => (int) $request->input('price'),
+				'qty' => (int) ($request->input('qty', 1)),
+				'slug' => $request->input('slug', null),
+			]];
+		}
+
+		$subtotal = collect($cartItems)->reduce(function ($carry, $item) {
+			return $carry + ((int) ($item['qty'] ?? 1) * (int) ($item['price'] ?? 0));
+		}, 0);
+		$shipping = $subtotal >= 2000000 ? 0 : 30000;
+		$total = $subtotal + $shipping;
+
+		$order = [
+			'id' => time() . mt_rand(1000, 9999),
+			'user_id' => $request->user()?->id ?? null,
+			'full_name' => $validated['full_name'],
+			'email' => $validated['email'],
+			'phone' => $validated['phone'],
+			'address' => $validated['address'],
+			'payment_method' => $validated['payment_method'],
+			'items' => $cartItems,
+			'subtotal' => $subtotal,
+			'shipping' => $shipping,
+			'total' => $total,
+			'created_at' => now()->toDateTimeString(),
+		];
+
+		$orders = $request->session()->get('orders', []);
+		array_unshift($orders, $order); // newest first
+		$request->session()->put('orders', $orders);
+
 		// Clear cart after successful order
 		$request->session()->forget('cart');
 
 		return redirect()->route('home')
-            ->with('success', 'Đơn hàng của bạn đã đặt thành công! Mã đơn: #' . mt_rand(100000, 999999));
+			->with('success', 'Đơn hàng của bạn đã đặt thành công! Mã đơn: #' . $order['id']);
     }
 }
 

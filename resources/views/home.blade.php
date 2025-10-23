@@ -43,17 +43,54 @@
     {{-- Featured products --}}
     <section class="mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h5 mb-0 section-title">Sản phẩm nổi bật</h2>
-            <div class="text-muted small">Hiển thị
-                {{ $products instanceof \Illuminate\Support\Collection ? $products->count() : (is_countable($products) ? count($products) : 0) }}
-                sản phẩm</div>
+            <h2 class="h5 mb-0 section-title">
+                @if(isset($activeCategory))
+                    @if(request('show_all'))
+                        Tất cả sản phẩm {{ $activeCategory->name }}
+                    @else
+                        Sản phẩm {{ $activeCategory->name }}
+                    @endif
+                @else
+                    @if(request('show_all'))
+                        Tất cả sản phẩm nổi bật
+                    @else
+                        Sản phẩm nổi bật
+                    @endif
+                @endif
+            </h2>
+            <div class="d-flex align-items-center gap-3">
+                @if(request('show_all'))
+                    <a href="{{ route('home', request()->except('show_all')) }}" class="text-decoration-none show-all-link">
+                        <div class="text-muted small">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Thu gọn hiển thị
+                        </div>
+                    </a>
+                @else
+                    <a href="{{ route('home', array_merge(request()->query(), ['show_all' => '1'])) }}" class="text-decoration-none show-all-link">
+                        <div class="text-muted small">
+                            @if(isset($activeCategory))
+                                Hiển thị tất cả sản phẩm {{ $activeCategory->name }}
+                            @else
+                                Hiển thị tất cả sản phẩm
+                            @endif
+                            <i class="bi bi-arrow-right ms-1"></i>
+                        </div>
+                    </a>
+                @endif
+                @if(isset($activeCategory))
+                    <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-house"></i> Về trang chủ
+                    </a>
+                @endif
+            </div>
         </div>
         <div class="row g-3">
             @forelse($products as $product)
                 <div class="col-6 col-md-3">
                     <div class="card h-100 product-card">
                         <a href="{{ route('product.show', $product->slug) }}">
-                            <img src="{{ $product->image ?? 'https://via.placeholder.com/400x300?text=Product' }}"
+                            <img src="{{ asset($product->image) ?? 'https://via.placeholder.com/400x300?text=Product' }}"
                                 class="card-img-top" alt="{{ $product->name }}">
                         </a>
                         <div class="card-body d-flex flex-column">
