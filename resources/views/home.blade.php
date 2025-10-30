@@ -89,11 +89,17 @@
                             href="{{ route('checkout.index', ['buy_now' => 1, 'name' => $product->name, 'price' => $product->price, 'qty' => 1]) }}">Mua
                             ngay</a>
                     </div>
-                </div>
+                    </div>
             </div>
         </div>
-    </section>
-    @endif
+        @empty
+            <div class="col-12">
+                <div class="alert alert-info">Chưa có sản phẩm nào.</div>
+            </div>
+        @endforelse
+    </div>
+</section>
+
 
     {{-- Featured products --}}
     <section class="mb-4">

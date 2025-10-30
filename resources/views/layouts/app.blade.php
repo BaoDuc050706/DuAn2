@@ -512,7 +512,7 @@
     </style>
 </head>
 
-<body {{-- HEADER --}} <header>
+<body> {{-- HEADER --}} <header>
     {{-- TOP BAR --}}
     <div class="topbar">
         <div class="container py-2">
@@ -556,6 +556,7 @@
                         <a href="{{ route('login') }}" class="text-white fs-5">
                             <i class="bi bi-person"></i>
                         </a>
+                        @auth
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
                             <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
@@ -577,6 +578,7 @@
                                 </form>
                             </li>
                         </ul>
+                        @endauth
                     </div>
 
                     <!-- Desktop Menu -->
