@@ -28,6 +28,7 @@ class User extends Authenticatable
         'ward',
         'address_line',
         'cart_json',
+        'role', // Thêm role vào fillable
     ];
 
     /**
@@ -51,5 +52,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Kiểm tra quyền admin
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 }

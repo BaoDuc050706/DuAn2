@@ -25,16 +25,20 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            // Load persisted cart for user if exists
             $user = Auth::user();
+
+            // Restore cart nếu có
             if ($user && !empty($user->cart_json)) {
                 $decoded = json_decode($user->cart_json, true);
                 if (is_array($decoded)) {
                     $request->session()->put('cart', $decoded);
                 }
             }
-            return redirect()->intended(route('home'))
-                ->with('success', 'Đăng nhập thành công.');
+
+            // Admin chuyển vào dashboard, user thường về home
+            $target = ($user && ($user->role === 'admin')) ? route('admin.dashboard') : route('home');
+
+            return redirect()->intended($target)->with('success', 'Đăng nhập thành công.');
         }
 
         return back()->withErrors([
@@ -50,5 +54,3 @@ class LoginController extends Controller
         return redirect()->route('home');
     }
 }
-
-

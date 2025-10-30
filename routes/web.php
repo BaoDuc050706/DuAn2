@@ -12,6 +12,11 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SearchController;
 
+//admin
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\OrderController;
+
 Route::redirect('/', '/home');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -55,3 +60,12 @@ Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('c
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+// Admin routes (require admin role)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::resource('/products', AdminProductController::class)->except(['show']);
+});

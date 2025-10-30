@@ -28,5 +28,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Màn hình', 'slug' => 'man-hinh', 'featured' => true, 'parent_id' => null, 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Loa', 'slug' => 'loa', 'featured' => false, 'parent_id' => null, 'created_at' => now(), 'updated_at' => now()],
         ]);
+
+        // Chạy AdminSeeder và ProductSeeder
+        $this->call(AdminSeeder::class);
+        $this->call(ProductSeeder::class);
     }
 }

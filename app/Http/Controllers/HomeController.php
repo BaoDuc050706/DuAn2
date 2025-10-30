@@ -17,7 +17,7 @@ class HomeController extends Controller
             $products = DB::table('products as p')
                 ->leftJoin('product_images as pi', function ($join) {
                     $join->on('pi.product_id', '=', 'p.id')
-                         ->where('pi.is_primary', '=', 1);
+                        ->where('pi.is_primary', '=', 1);
                 })
                 ->select([
                     'p.slug',
@@ -27,7 +27,7 @@ class HomeController extends Controller
                     'p.stock',
                     'p.connection',
                     'p.rgb',
-                    DB::raw('pi.image_url as image'),
+                    DB::raw('COALESCE(pi.image_url, p.image) as image'),
                 ])
                 ->orderByDesc('p.created_at');
 

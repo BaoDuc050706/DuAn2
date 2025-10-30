@@ -556,6 +556,27 @@
                         <a href="{{ route('login') }}" class="text-white fs-5">
                             <i class="bi bi-person"></i>
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
+                            <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            @if(auth()->user()->role === 'admin')
+                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-gear"></i> Trang Admin</a></li>
+                            @endif
+                            <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                    @csrf
+                                    <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
 
                     <!-- Desktop Menu -->
@@ -640,10 +661,10 @@
         @php $flashSuccess = session()->pull('success');
         $flashError = session()->pull('error'); @endphp
         @if ($flashSuccess)
-            <div class="alert alert-success">{{ $flashSuccess }}</div>
+        <div class="alert alert-success">{{ $flashSuccess }}</div>
         @endif
         @if ($flashError)
-            <div class="alert alert-danger">{{ $flashError }}</div>
+        <div class="alert alert-danger">{{ $flashError }}</div>
         @endif
         @yield('content')
     </main>
@@ -696,7 +717,9 @@
                 wrap.className = 'toast-fixed alert alert-success shadow';
                 wrap.textContent = message;
                 document.body.appendChild(wrap);
-                setTimeout(() => { wrap.remove(); }, 3000);
+                setTimeout(() => {
+                    wrap.remove();
+                }, 3000);
             }
 
             function updateBadge(byQty) {
