@@ -509,6 +509,46 @@
                 transform: scale(1.2);
             }
         }
+        .dark-mode {
+    color: #ddd; /* màu chữ mặc định sáng hơn */
+}
+
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode p,
+.dark-mode span,
+.dark-mode a,
+.dark-mode li,
+.dark-mode label,
+.dark-mode small {
+    color: #f1f1f1 !important; /* ép chữ sáng */
+}
+
+/* Nếu có phần tử đang dùng text-dark, đổi sang sáng */
+.dark-mode .text-dark {
+    color: #f1f1f1 !important;
+}
+
+/* Nếu có màu đen hoặc xám cố định (#111, #222, #333, #444, #555) */
+.dark-mode [style*="color:#111"],
+.dark-mode [style*="color:#222"],
+.dark-mode [style*="color:#333"],
+.dark-mode [style*="color:#444"],
+.dark-mode [style*="color:#555"] {
+    color: #f1f1f1 !important;
+}
+
+/* Các link trong dark mode */
+.dark-mode a {
+    color: #9cd3ff !important;
+}
+.dark-mode a:hover {
+    color: #fff !important;
+}
     </style>
 </head>
 
