@@ -528,11 +528,11 @@
                     </button>
                     <div class="category-dropdown mt-2" id="categoryDropdown">
                         @forelse(($featuredCategories ?? collect()) as $cat)
-                            <a class="category-item" href="{{ url('/category/' . $cat->slug) }}">
-                                <i class="bi bi-tag"></i> <span>{{ $cat->name }}</span>
-                            </a>
+                        <a class="category-item" href="{{ url('/category/' . $cat->slug) }}">
+                            <i class="bi bi-tag"></i> <span>{{ $cat->name }}</span>
+                        </a>
                         @empty
-                            <div class="p-3 text-muted small">Chưa có danh mục</div>
+                        <div class="p-3 text-muted small">Chưa có danh mục</div>
                         @endforelse
                     </div>
                 </div>
@@ -556,6 +556,7 @@
                         <a href="{{ route('login') }}" class="text-white fs-5">
                             <i class="bi bi-person"></i>
                         </a>
+                        @auth
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
                             <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
@@ -577,6 +578,7 @@
                                 </form>
                             </li>
                         </ul>
+                        @endauth
                     </div>
 
                     <!-- Desktop Menu -->
@@ -589,8 +591,8 @@
                             id="cartLink">
                             <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
                             @php
-                                $cart = session('cart', []);
-                                $cartQty = collect($cart)->sum('qty');
+                            $cart = session('cart', []);
+                            $cartQty = collect($cart)->sum('qty');
                             @endphp
                             <span
                                 class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}"
@@ -605,37 +607,37 @@
                             </div>
                         </div>
                         @auth
-                            <div class="dropdown">
-                                <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i> <span
-                                        class="value">{{ auth()->user()->name }}</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
-                                            {{ auth()->user()->email }}</span></li>
-                                    <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
-                                            {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
-                                            @csrf
-                                            <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="dropdown">
+                            <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-circle"></i> <span
+                                    class="value">{{ auth()->user()->name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
+                                        {{ auth()->user()->email }}</span></li>
+                                <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
+                                        {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                        @csrf
+                                        <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                         @else
-                            <a href="{{ route('login') }}" class="info-item text-decoration-none"><i
-                                    class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
+                        <a href="{{ route('login') }}" class="info-item text-decoration-none"><i
+                                class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
                         @endauth
                     </div>
                 </div>
@@ -709,9 +711,10 @@
     {{-- JS Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function () {
+        (function() {
             const badge = document.getElementById('cartQtyBadge');
             const cartIcon = document.getElementById('cartIcon');
+
             function showToast(message) {
                 const wrap = document.createElement('div');
                 wrap.className = 'toast-fixed alert alert-success shadow';
@@ -778,7 +781,7 @@
         })();
     </script>
     <script>
-        (function () {
+        (function() {
             const toggle = document.getElementById('theme-toggle');
             if (!toggle) return;
             const html = document.documentElement;
@@ -808,18 +811,18 @@
         })();
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const wrap = document.querySelector('.category-wrap');
             const btn = document.getElementById('categoryToggle');
 
             // click nút để mở/đóng dropdown
-            btn.addEventListener('click', function (e) {
+            btn.addEventListener('click', function(e) {
                 e.stopPropagation(); // tránh click ngoài đóng
                 wrap.classList.toggle('active');
             });
 
             // click ra ngoài đóng dropdown
-            document.addEventListener('click', function () {
+            document.addEventListener('click', function() {
                 wrap.classList.remove('active');
             });
         });

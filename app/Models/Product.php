@@ -13,10 +13,13 @@ class Product extends Model
         'name',
         'slug',
         'price',
+        'stock',
         'description',
         'image',
         'category_id', // nếu dùng relation
         'discount',
+        'connection',
+        'rgb',
     ];
 
     // Relation đến category

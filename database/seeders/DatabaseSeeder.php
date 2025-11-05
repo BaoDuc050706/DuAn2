@@ -29,7 +29,8 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Loa', 'slug' => 'loa', 'featured' => false, 'parent_id' => null, 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Chạy AdminSeeder và ProductSeeder
+        // Chạy CategorySeeder, AdminSeeder và ProductSeeder
+        $this->call(CategorySeeder::class);
         $this->call(AdminSeeder::class);
         $this->call(ProductSeeder::class);
     }
