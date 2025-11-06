@@ -15,6 +15,7 @@ class HomeController extends Controller
         $activeCategory = null;
         if (Schema::hasTable('products')) {
             $products = DB::table('products as p')
+                // Join lấy ảnh chính, nếu không có thì lấy ảnh mặc định của sản phẩm
                 ->leftJoin('product_images as pi', function ($join) {
                     $join->on('pi.product_id', '=', 'p.id')
                         ->where('pi.is_primary', '=', 1);
@@ -27,6 +28,7 @@ class HomeController extends Controller
                     'p.stock',
                     'p.connection',
                     'p.rgb',
+                    // Ưu tiên ảnh chính, nếu không có thì lấy ảnh mặc định
                     DB::raw('COALESCE(pi.image_url, p.image) as image'),
                 ])
                 ->orderByDesc('p.created_at');
@@ -39,11 +41,11 @@ class HomeController extends Controller
                     // first try exact slug
                     $cat = Category::where('slug', $categoryQuery)->first();
                     // if not found, try name (case-insensitive)
-                    if (! $cat) {
+                    if (!$cat) {
                         $cat = Category::whereRaw('LOWER(name) = ?', [strtolower($categoryQuery)])->first();
                     }
                     // also try name LIKE as fallback
-                    if (! $cat) {
+                    if (!$cat) {
                         $cat = Category::where('name', 'like', "%{$categoryQuery}%")->first();
                     }
                 } catch (\Throwable $e) {
@@ -52,7 +54,6 @@ class HomeController extends Controller
 
                 if ($cat) {
                     $activeCategory = $cat;
-                    // Filter by category_id column if it exists
                     if (Schema::hasColumn('products', 'category_id')) {
                         $products = $products->where('p.category_id', $cat->id);
                     }
@@ -62,10 +63,19 @@ class HomeController extends Controller
             // Kiểm tra xem có yêu cầu hiển thị tất cả sản phẩm không
             $showAll = $request->query('show_all', false);
             if ($showAll) {
-                $products = $products->get(); // Hiển thị tất cả sản phẩm
+                $products = $products->get();
             } else {
-                $products = $products->limit(isset($activeCategory) ? 20 : 8)->get(); // Giới hạn như cũ
+                $products = $products->limit(isset($activeCategory) ? 20 : 8)->get();
             }
+
+            // Đảm bảo mỗi sản phẩm đều có trường 'image' hợp lệ
+            $products = $products->map(function ($product) {
+                // Nếu không có ảnh, gán ảnh mặc định (ví dụ: '/images/no-image.png')
+                if (empty($product->image)) {
+                    $product->image = '/images/no-image.png';
+                }
+                return $product;
+            });
         }
 
         // Danh mục cho phần "Danh mục nổi bật" (không bao gồm Laptop)
@@ -74,7 +84,8 @@ class HomeController extends Controller
         if ($categoryTable !== null) {
             $categories = DB::table($categoryTable)
                 ->select(DB::raw('id, name, slug'))
-                ->where('name', '!=', 'Laptop')
+                // Exclude Laptop and Loa from the "Danh mục nổi bật" section
+                ->whereNotIn('name', ['Laptop', 'Loa'])
                 ->orderBy('name')
                 ->limit(8)
                 ->get();
