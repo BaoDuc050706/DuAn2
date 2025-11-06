@@ -161,24 +161,28 @@
             background: #fff;
             color: #111;
             border: 1px solid #eee;
-            border-radius: .5rem;
+            border-radius: 12px; /* bo tròn giống mobile */
             box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
-            min-width: 320px;
-            width: auto;
+            min-width: 0;
+            width: max-content; /* vừa đủ chữ */
+            max-width: 90vw; /* an toàn trên màn nhỏ */
+            padding: 6px 0; /* gọn hơn */
+            overflow: hidden; /* bo góc nội dung */
             display: none;
         }
 
         .category-item {
-            padding: 12px 16px 12px 20px;
+            padding: 12px 16px 12px 20px; /* đồng bộ mobile */
             display: flex;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: flex-start; /* giống mobile: icon + chữ lệch trái */
             gap: 0.5rem;
             text-decoration: none;
             color: #222;
-            font-size: 0.95rem;
+            font-size: 0.95rem; /* giữ cỡ chữ dễ đọc */
             font-weight: 500;
             transition: background-color 0.2s ease;
+            white-space: nowrap; /* không xuống dòng, giữ vừa đủ chữ */
         }
 
         .category-item i {
@@ -188,6 +192,59 @@
 
         .category-item:hover {
             background: #f6f7f8;
+        }
+
+        /* Dark mode for dropdowns */
+        .dark-mode .dropdown-menu {
+            background-color: #1f232a;
+            color: #e8e8ea;
+            border: 1px solid #2f343c;
+        }
+        .dark-mode .dropdown-menu .dropdown-item,
+        .dark-mode .dropdown-menu .dropdown-item-text {
+            color: #e8e8ea;
+        }
+        .dark-mode .dropdown-menu .dropdown-item:hover,
+        .dark-mode .dropdown-menu .dropdown-item:focus {
+            background-color: #2b2f36;
+            color: #ffffff;
+        }
+
+        /* Category dropdown in dark mode */
+        .dark-mode .category-dropdown {
+            background: #1f232a !important;
+            color: #e8e8ea !important;
+            border: 1px solid #2f343c !important;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .35) !important;
+        }
+        .dark-mode .category-item {
+            color: #e8e8ea;
+        }
+        .dark-mode .category-item:hover {
+            background: #2b2f36;
+        }
+
+        /* Desktop: dropdown danh mục gọn như mobile */
+        @media (min-width: 769px) {
+            .category-wrap { position: relative; }
+            .category-dropdown {
+                position: absolute !important;
+                top: 100% !important;
+                right: 0 !important;
+                left: auto !important;
+                width: max-content !important;
+                min-width: 180px !important;
+                max-width: 50vw !important;
+                border: 1px solid #eee !important;
+                border-radius: 12px !important; /* đồng bộ mobile */
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+                padding: 6px 0 !important;
+            }
+            .dark-mode .category-dropdown {
+                background: #1f232a !important;
+                border-color: #2f343c !important;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, .35) !important;
+            }
         }
 
         .search-wrap .form-control {
@@ -255,12 +312,75 @@
         }
 
         .dark-mode .product-card {
-            background-color: #1a1a1a;
-            border-color: #333;
+            background-color: #1f232a; /* tăng tương phản nhẹ, không quá đen */
+            border-color: #2f343c;
         }
 
         .dark-mode .product-card .price {
             color: #ff6b6b;
+        }
+
+        /* Tối ưu thêm hiển thị nội dung trong card khi dark mode */
+        .dark-mode .product-card:hover {
+            box-shadow: 0 10px 24px rgba(0, 0, 0, .45);
+        }
+        .dark-mode .product-card .card-title,
+        .dark-mode .product-card .h5,
+        .dark-mode .product-card .fw-bold {
+            color: #ffffff !important;
+        }
+        .dark-mode .product-card .card-text,
+        .dark-mode .product-card .text-muted {
+            color: #c7ced8 !important;
+        }
+        .dark-mode .product-card .old-price,
+        .dark-mode .product-card .text-decoration-line-through {
+            color: #9aa4b2 !important;
+        }
+        .dark-mode .product-card .btn-primary {
+            background-color: #3a4a6a;
+            border-color: #465a7a;
+        }
+        .dark-mode .product-card .btn-primary:hover {
+            background-color: #465a7a;
+            border-color: #51668a;
+        }
+        .dark-mode .product-card .btn-outline-secondary {
+            color: #d6dbe4;
+            border-color: #5a6575;
+        }
+        .dark-mode .product-card .btn-outline-secondary:hover {
+            background-color: #313641;
+            border-color: #6b7688;
+            color: #ffffff;
+        }
+        /* Tránh bị mờ ở trạng thái disabled trên dark mode */
+        .dark-mode .product-card .btn-outline-secondary:disabled,
+        .dark-mode .product-card .btn-outline-secondary.disabled {
+            opacity: 1 !important; /* ghi đè bootstrap */
+            color: #9aa4b2 !important;
+            border-color: #4a5260 !important;
+            background-color: #232831 !important;
+            cursor: not-allowed;
+        }
+        /* Nút thêm vào giỏ đang dùng .btn-outline-dark */
+        .dark-mode .product-card .btn-outline-dark {
+            color: #e8e8ea;
+            border-color: #646e7d;
+            background-color: #232831; /* tránh bị chìm */
+        }
+        .dark-mode .product-card .btn-outline-dark:hover,
+        .dark-mode .product-card .btn-outline-dark:focus {
+            background-color: #313641;
+            border-color: #7a8597;
+            color: #ffffff;
+        }
+        .dark-mode .product-card .btn-outline-dark:disabled,
+        .dark-mode .product-card .btn-outline-dark.disabled {
+            opacity: 1 !important;
+            color: #98a2b3 !important;
+            border-color: #4a5260 !important;
+            background-color: #232831 !important;
         }
 
         .dark-mode .hero {
@@ -343,18 +463,19 @@
             /* đổi màu nền nhẹ */
         }
 
-        /* dropdown ẩn mặc định */
-        .category-dropdown {
-            position: fixed !important;
-            top: 60px !important;
-            /* đúng dưới header */
-            left: 0 !important;
-            width: 100vw !important;
-            border: none !important;
-            border-radius: 0 !important;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
-            background: #fff !important;
-            z-index: 2000;
+        /* dropdown ẩn mặc định (mobile-only phiên bản full-width) */
+        @media (max-width: 768px) {
+            .category-dropdown {
+                position: fixed !important;
+                top: 60px !important; /* đúng dưới header */
+                left: 0 !important;
+                width: 100vw !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+                background: #fff !important;
+                z-index: 2000;
+            }
         }
 
 
@@ -544,10 +665,122 @@
 
 /* Các link trong dark mode */
 .dark-mode a {
-    color: #9cd3ff !important;
+    color: #a9c3ff !important; /* dịu hơn */
 }
 .dark-mode a:hover {
-    color: #fff !important;
+    color: #d6e3ff !important; /* hover nhẹ, không quá gắt */
+}
+/* Nút trong dark mode dịu hơn, tránh tương phản mạnh */
+.dark-mode .btn-dark {
+    background-color: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #f1f1f1;
+}
+.dark-mode .btn-dark:hover {
+    background-color: #3a3a3a;
+    border-color: #4a4a4a;
+}
+.dark-mode .btn-primary {
+    background-color: #3a4a6a;
+    border-color: #465a7a;
+}
+.dark-mode .btn-primary:hover {
+    background-color: #465a7a;
+    border-color: #51668a;
+}
+.dark-mode .btn-outline-primary {
+    color: #a9c3ff;
+    border-color: #5c73a6;
+}
+.dark-mode .btn-outline-primary:hover {
+    background-color: #2a2f3d;
+    color: #d6e3ff;
+}
+/* Footer link dịu hơn */
+.dark-mode footer a {
+    color: #b7c5d6 !important;
+}
+.dark-mode footer a:hover {
+    color: #e0e7ef !important;
+}
+/* Dark mode for cart and Bootstrap components */
+.dark-mode .card {
+    background-color: #1b1b1b;
+    border-color: #333;
+    color: #f1f1f1;
+}
+.dark-mode .card .card-body {
+    color: #f1f1f1;
+}
+.dark-mode .border-bottom {
+    border-bottom-color: #333 !important;
+}
+.dark-mode .list-group-item {
+    background-color: #1b1b1b;
+    color: #f1f1f1;
+    border-color: #333;
+}
+.dark-mode .btn-outline-secondary {
+    color: #ddd;
+    border-color: #777;
+}
+.dark-mode .btn-outline-secondary:hover {
+    background-color: #444;
+    border-color: #999;
+    color: #fff;
+}
+.dark-mode .btn-outline-danger {
+    color: #ff9a9a;
+    border-color: #aa4a4a;
+}
+.dark-mode .btn-outline-danger:hover {
+    background-color: #8a2e2e;
+    color: #fff;
+}
+.dark-mode .alert {
+    background-color: #1f1f1f;
+    color: #f1f1f1;
+    border-color: #333;
+}
+.dark-mode .form-control {
+    background-color: #1f1f1f;
+    border-color: #333;
+    color: #f1f1f1;
+}
+/* Search box trong header ở dark mode: nền sáng hơn để không chìm */
+.dark-mode .topbar .search-wrap .form-control {
+    background-color: #2b2f36; /* xám than dịu, không đen thui */
+    border: 1px solid #3d4148;
+    color: #f1f1f1;
+}
+.dark-mode .topbar .search-wrap .form-control::placeholder {
+    color: #b9c0c9;
+}
+.dark-mode .topbar .search-wrap .form-control:focus {
+    background-color: #313641;
+    border-color: #586072;
+    box-shadow: 0 0 0 .2rem rgba(88, 96, 114, .25);
+}
+/* Tăng độ tương phản chữ trong dark mode (tránh bị chìm) */
+.dark-mode .text-muted {
+    color: #c7ced8 !important; /* sáng hơn muted mặc định */
+}
+.dark-mode .text-secondary {
+    color: #cfd6df !important;
+}
+.dark-mode p,
+.dark-mode small,
+.dark-mode .lead {
+    color: #e8e8ea !important;
+}
+.dark-mode .fw-bold,
+.dark-mode .h1,
+.dark-mode .h2,
+.dark-mode .h3,
+.dark-mode .h4,
+.dark-mode .h5,
+.dark-mode .h6 {
+    color: #ffffff !important;
 }
     </style>
 </head>
