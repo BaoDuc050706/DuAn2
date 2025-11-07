@@ -19,16 +19,18 @@ class HomeController extends Controller
                     $join->on('pi.product_id', '=', 'p.id')
                         ->where('pi.is_primary', '=', 1);
                 })
-                ->select([
-                    'p.slug',
-                    'p.name',
-                    'p.price',
-                    'p.discount',
-                    'p.stock',
-                    'p.connection',
-                    'p.rgb',
-                    DB::raw('COALESCE(pi.image_url, p.image) as image'),
-                ])
+         ->select([
+            'p.id',                     // ✅ THÊM DÒNG NÀY
+            'p.slug',
+            'p.name',
+            'p.price',
+            'p.discount',
+            'p.stock',
+            'p.connection',
+            'p.rgb',
+            DB::raw('COALESCE(pi.image_url, p.image) as image'),
+])
+
                 ->orderByDesc('p.created_at');
 
             // If category filter provided, try to find Category by slug or name (case-insensitive)
