@@ -722,6 +722,7 @@
 
     {{-- CONTENT --}}
     <main class="container mt-4">
+<<<<<<< HEAD
         @php $flashSuccess = session()->pull('success');
         $flashError = session()->pull('error'); @endphp
         @if ($flashSuccess)
@@ -732,6 +733,35 @@
         @endif
         @yield('content')
     </main>
+=======
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @yield('content')
+</main>
+
+<script>
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            alert.classList.remove('show');
+        }
+    }, 5000);
+</script>
+
+>>>>>>> d669409cc3643ed414f77cf1d86e8d395373742f
 
     {{-- FOOTER --}}
     <footer>

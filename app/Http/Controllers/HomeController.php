@@ -21,6 +21,7 @@ class HomeController extends Controller
                         ->where('pi.is_primary', '=', 1);
                 })
                 ->select([
+                    'p.id',                     // ✅ THÊM DÒNG NÀY
                     'p.slug',
                     'p.name',
                     'p.price',
@@ -28,9 +29,9 @@ class HomeController extends Controller
                     'p.stock',
                     'p.connection',
                     'p.rgb',
-                    // Ưu tiên ảnh chính, nếu không có thì lấy ảnh mặc định
                     DB::raw('COALESCE(pi.image_url, p.image) as image'),
                 ])
+
                 ->orderByDesc('p.created_at');
 
             // If category filter provided, try to find Category by slug or name (case-insensitive)

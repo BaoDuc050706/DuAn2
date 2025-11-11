@@ -13,18 +13,20 @@ class Product extends Model
         'name',
         'slug',
         'price',
-        'stock',
         'description',
         'image',
-        'category_id', // nếu dùng relation
+        'category_id',
         'discount',
-        'connection',
-        'rgb',
     ];
 
-    // Relation đến category
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
 }
+    

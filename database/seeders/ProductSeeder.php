@@ -107,7 +107,7 @@ class ProductSeeder extends Seeder
                 'connection' => 'Không dây',
                 'rgb' => 1,
                 'description' => 'Tai nghe không dây pin bền.',
-                'image' => 'san-pham-razer_29666dac65f14925ad0273f3961226f1.jpg',
+                'image' => 'tai-nghe-wireless-pro.jpg',
             ],
             // --- Laptop products added from attachments ---
             [

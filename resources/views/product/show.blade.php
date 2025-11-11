@@ -5,8 +5,12 @@
 @section('content')
     <div class="row g-4">
         <div class="col-md-6">
-            <img id="productMainImg" src="{{ asset($product->image) }}" alt="{{ $product->name }}"
-                class="img-fluid rounded shadow-sm">
+ <img src="{{ asset('image/' . $product->image) }}" 
+     alt="{{ $product->name }}" 
+     class="img-fluid">
+
+
+
         </div>
         <div class="col-md-6">
             <h1 class="h3 mb-3">{{ $product->name }}</h1>
@@ -14,16 +18,18 @@
             <p class="text-muted">{{ $product->description }}</p>
 
             <div class="d-flex gap-2 mt-4">
-                <form method="post" action="{{ route('cart.add') }}" class="add-to-cart-form" data-img="#productMainImg">
-                    @csrf
-                    <input type="hidden" name="name" value="{{ $product->name }}">
-                    <input type="hidden" name="price" value="{{ $product->price }}">
-                    <input type="hidden" name="qty" value="1">
-                    <input type="hidden" name="slug" value="{{ $product->slug }}">
-                    <button class="btn btn-dark" type="submit">
-                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
-                    </button>
-                </form>
+                <form action="{{ route('cart.add') }}" method="POST">
+    @csrf
+    <input type="hidden" name="product_id" value="{{ $product->id }}">
+    <input type="hidden" name="name" value="{{ $product->name }}">
+    <input type="hidden" name="price" value="{{ $product->price }}">
+    <input type="hidden" name="qty" value="1">
+    <input type="hidden" name="slug" value="{{ $product->slug }}">
+    <button class="btn btn-dark" type="submit">
+        <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
+    </button>
+</form>
+
 
                 <a class="btn btn-danger" href="{{ route('checkout.index', [
         'buy_now' => 1,
