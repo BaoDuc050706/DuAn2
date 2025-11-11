@@ -5,42 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
+use App\Models\ProductImage;
 
 class ProductController extends Controller
 {
+    // Trang chi tiết sản phẩm
     public function show($slug)
     {
-        // Lấy sản phẩm với hình ảnh từ bảng product_images
-        $product = DB::table('products as p')
-            ->leftJoin('product_images as pi', function ($join) {
-                $join->on('pi.product_id', '=', 'p.id')
-                     ->where('pi.is_primary', '=', 1);
-            })
-            ->where('p.slug', $slug)
-            ->select([
-                'p.id',
-                'p.name',
-                'p.slug',
-                'p.price',
-                'p.discount',
-                'p.stock',
-                'p.connection',
-                'p.rgb',
-                'p.description',
-                'p.category_id',
-                DB::raw('pi.image_url as image'),
-            ])
-            ->first();
+        // Lấy sản phẩm và ảnh chính
+        $product = Product::with(['images' => function ($query) {
+            $query->where('is_primary', 1);
+        }])->where('slug', $slug)->firstOrFail();
 
-        if (!$product) {
-            abort(404);
-        }
+        // Lấy đường dẫn ảnh (nếu có)
+        $product->image_url = $product->images->first()->image_url ?? null;
 
         return view('product.show', compact('product'));
     }
 
-    // Thêm phương thức này
+    // Trang danh mục sản phẩm
     public function category($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
@@ -48,4 +31,9 @@ class ProductController extends Controller
 
         return view('category.show', compact('category', 'products'));
     }
+    public function images()
+{
+    return $this->hasMany(ProductImage::class);
+}
+
 }

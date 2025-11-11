@@ -8,7 +8,9 @@ use Illuminate\Http\RedirectResponse;
 
 class CartController extends Controller
 {
-    // Hiển thị giỏ hàng
+    /**
+     * Hiển thị giỏ hàng
+     */
     public function index(Request $request): View
     {
         $cartItems = $request->session()->get('cart', []);
@@ -17,35 +19,47 @@ class CartController extends Controller
         return view('cart.index', compact('cartItems', 'total'));
     }
 
-    // Thêm sản phẩm vào giỏ
+    /**
+     * Thêm sản phẩm vào giỏ hàng
+     */
     public function add(Request $request): RedirectResponse
     {
-        $productId = $request->input('product_id');
+        $productId = (int) $request->input('product_id');
         $cart = $request->session()->get('cart', []);
 
-        // Kiểm tra xem sản phẩm đã có trong giỏ chưa
-        $existingIndex = collect($cart)->search(fn($item) => $item['product_id'] == $productId);
+        // ✅ Chỉ kiểm tra theo product_id
+        $existingIndex = collect($cart)->search(fn($item) =>
+            (int) $item['product_id'] === $productId
+        );
 
         if ($existingIndex !== false) {
-            // Nếu có rồi thì tăng số lượng
-            $cart[$existingIndex]['qty'] += $request->input('qty', 1);
+            // ✅ Nếu đã có -> tăng số lượng
+            $cart[$existingIndex]['qty'] += (int) $request->input('qty', 1);
         } else {
-            // Nếu chưa có thì thêm mới
+            // ✅ Nếu chưa có -> thêm mới
             $cart[] = [
                 'product_id' => $productId,
-                'name' => $request->input('name'),
-                'price' => $request->input('price'),
-                'qty' => $request->input('qty', 1),
-                'slug' => $request->input('slug'),
+                'name'       => $request->input('name'),
+                'price'      => (int) $request->input('price'),
+                'qty'        => (int) $request->input('qty', 1),
+                'slug'       => $request->input('slug'),
             ];
         }
 
+        // ✅ RẤT QUAN TRỌNG: reset key để tránh tách sản phẩm
+        $cart = array_values($cart);
+
+        // ✅ Lưu lại giỏ hàng
         $request->session()->put('cart', $cart);
-        return redirect()->route('cart.index')->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+
+        return redirect()->route('cart.index')
+                         ->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
     }
 
-    // Tăng số lượng
-    public function increment(Request $request, $index): RedirectResponse
+    /**
+     * Tăng số lượng
+     */
+    public function increment(Request $request, int $index): RedirectResponse
     {
         $cart = $request->session()->get('cart', []);
         if (isset($cart[$index])) {
@@ -55,8 +69,10 @@ class CartController extends Controller
         return redirect()->route('cart.index');
     }
 
-    // Giảm số lượng
-    public function decrement(Request $request, $index): RedirectResponse
+    /**
+     * Giảm số lượng
+     */
+    public function decrement(Request $request, int $index): RedirectResponse
     {
         $cart = $request->session()->get('cart', []);
         if (isset($cart[$index]) && $cart[$index]['qty'] > 1) {
@@ -66,21 +82,30 @@ class CartController extends Controller
         return redirect()->route('cart.index');
     }
 
-    // Xóa 1 sản phẩm khỏi giỏ
-    public function remove(Request $request, $index): RedirectResponse
+    /**
+     * Xóa sản phẩm
+     */
+    public function remove(Request $request, int $index): RedirectResponse
     {
         $cart = $request->session()->get('cart', []);
         if (isset($cart[$index])) {
             unset($cart[$index]);
-            $request->session()->put('cart', array_values($cart));
+            // ✅ reset key
+            $cart = array_values($cart);
+            $request->session()->put('cart', $cart);
         }
-        return redirect()->route('cart.index');
+
+        return redirect()->route('cart.index')
+                         ->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
-    // Xóa toàn bộ giỏ hàng
+    /**
+     * Xóa toàn bộ
+     */
     public function clear(Request $request): RedirectResponse
     {
         $request->session()->forget('cart');
-        return redirect()->route('cart.index')->with('success', 'Đã xóa giỏ hàng.');
+        return redirect()->route('cart.index')
+                         ->with('success', 'Đã xóa toàn bộ giỏ hàng!');
     }
 }

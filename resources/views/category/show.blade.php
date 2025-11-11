@@ -38,18 +38,14 @@
                             <div class="price mb-2">{{ number_format($product->price,0,',','.') }}₫</div>
                         @endif
                         <div class="d-flex gap-2 mt-auto">
-                            <form action="{{ route('cart.add') }}" method="POST">
-    @csrf
-    <input type="hidden" name="product_id" value="{{ $product->id }}">
-    <input type="hidden" name="name" value="{{ $product->name }}">
-    <input type="hidden" name="price" value="{{ $product->price }}">
-    <input type="hidden" name="qty" value="1">
-    <input type="hidden" name="slug" value="{{ $product->slug }}">
-    <button class="btn btn-dark" type="submit">
-        <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
-    </button>
-</form>
-
+                            <form method="post" action="{{ route('cart.add') }}" class="add-to-cart-form">
+                                @csrf
+                                <input type="hidden" name="name" value="{{ $product->name }}">
+                                <input type="hidden" name="price" value="{{ $product->price }}">
+                                <input type="hidden" name="qty" value="1">
+                                <input type="hidden" name="slug" value="{{ $product->slug }}">
+                                <button class="btn btn-outline-dark" type="submit">Thêm vào giỏ hàng</button>
+                            </form>
                             <a class="btn btn-danger"
                                 href="{{ route('checkout.index', ['buy_now' => 1, 'name' => $product->name, 'price' => $product->price, 'qty' => 1]) }}">Mua
                                 ngay</a>

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request; // ⚠️ THÊM DÒNG NÀY !!!
 
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -13,7 +12,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SearchController;
 
-// admin
+//admin
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController;
@@ -30,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
 });
 
-// Public order lookup (no auth)
+// Public order lookup (no auth) - searches session-stored orders
 Route::get('/orders/lookup', [\App\Http\Controllers\OrderController::class, 'lookup'])->name('orders.lookup');
 
 // Product detail
@@ -38,12 +37,12 @@ Route::get('/product/{slug}', [ProductController::class, 'show'])->name('product
 // Category page
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('category.show');
 
-// Auth - Login
+// Auth - Login (demo)
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'submit'])->name('login.submit');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Auth - Register
+// Auth - Register (demo)
 Route::get('/register', [RegisterController::class, 'show'])->name('register.show');
 Route::post('/register', [RegisterController::class, 'submit'])->name('register.submit');
 
@@ -55,26 +54,13 @@ Route::middleware('auth')->group(function () {
 
 // Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.remove');
 Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
 Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
-Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-
-// Clear / reset cart
-Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
-
-// Debug route
-Route::get('/debug-cart', function (Request $request) {
-    dd([
-        'session_id' => session()->getId(),
-        'cart' => session()->get('cart'),
-        'all_session_data' => session()->all()
-    ]);
-});
 
 // Admin routes (require admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -83,12 +69,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('/products', AdminProductController::class)->except(['show']);
-});
-
-// Test session route
-Route::get('/test-session', function (Request $request) {
-    dd([
-        'cart' => $request->session()->get('cart'),
-        'has_cart' => $request->session()->has('cart'),
-    ]);
 });
