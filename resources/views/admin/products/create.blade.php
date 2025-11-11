@@ -98,21 +98,5 @@
             </div>
         </div>
     </div>
-
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h6>Hướng dẫn</h6>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled small">
-                    <li><i class="fas fa-info-circle text-primary"></i> Tên sản phẩm sẽ tự động tạo slug</li>
-                    <li><i class="fas fa-info-circle text-primary"></i> Giá nhập bằng VNĐ</li>
-                    <li><i class="fas fa-info-circle text-primary"></i> Giảm giá tính theo phần trăm</li>
-                    <li><i class="fas fa-info-circle text-primary"></i> Hình ảnh sẽ được lưu trong thư mục public/image</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection
