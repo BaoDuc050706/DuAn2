@@ -509,207 +509,250 @@
                 transform: scale(1.2);
             }
         }
+
         .dark-mode {
-    color: #ddd; /* màu chữ mặc định sáng hơn */
-}
+            color: #ddd;
+            /* màu chữ mặc định sáng hơn */
+        }
 
-.dark-mode h1,
-.dark-mode h2,
-.dark-mode h3,
-.dark-mode h4,
-.dark-mode h5,
-.dark-mode h6,
-.dark-mode p,
-.dark-mode span,
-.dark-mode a,
-.dark-mode li,
-.dark-mode label,
-.dark-mode small {
-    color: #f1f1f1 !important; /* ép chữ sáng */
-}
+        .dark-mode h1,
+        .dark-mode h2,
+        .dark-mode h3,
+        .dark-mode h4,
+        .dark-mode h5,
+        .dark-mode h6,
+        .dark-mode p,
+        .dark-mode span,
+        .dark-mode a,
+        .dark-mode li,
+        .dark-mode label,
+        .dark-mode small {
+            color: #f1f1f1 !important;
+            /* ép chữ sáng */
+        }
 
-/* Nếu có phần tử đang dùng text-dark, đổi sang sáng */
-.dark-mode .text-dark {
-    color: #f1f1f1 !important;
-}
+        /* Nếu có phần tử đang dùng text-dark, đổi sang sáng */
+        .dark-mode .text-dark {
+            color: #f1f1f1 !important;
+        }
 
-/* Nếu có màu đen hoặc xám cố định (#111, #222, #333, #444, #555) */
-.dark-mode [style*="color:#111"],
-.dark-mode [style*="color:#222"],
-.dark-mode [style*="color:#333"],
-.dark-mode [style*="color:#444"],
-.dark-mode [style*="color:#555"] {
-    color: #f1f1f1 !important;
-}
+        /* Nếu có màu đen hoặc xám cố định (#111, #222, #333, #444, #555) */
+        .dark-mode [style*="color:#111"],
+        .dark-mode [style*="color:#222"],
+        .dark-mode [style*="color:#333"],
+        .dark-mode [style*="color:#444"],
+        .dark-mode [style*="color:#555"] {
+            color: #f1f1f1 !important;
+        }
 
-/* Các link trong dark mode */
-.dark-mode a {
-    color: #9cd3ff !important;
-}
-.dark-mode a:hover {
-    color: #fff !important;
-}
+        /* Các link trong dark mode */
+        .dark-mode a {
+            color: #9cd3ff !important;
+        }
+
+        .dark-mode a:hover {
+            color: #fff !important;
+        }
     </style>
 </head>
 
 <body> {{-- HEADER --}} <header>
-    {{-- TOP BAR --}}
-    <div class="topbar">
-        <div class="container py-2">
-            <div class="d-flex align-items-center justify-content-between flex-nowrap position-relative w-100">
-                <!-- Logo -->
-                <a class="navbar-brand m-0 flex-shrink-0" href="/"><span class="brand-icon">🖥️</span><span
-                        class="brand-text">CAEKT</span></a>
+        {{-- TOP BAR --}}
+        <div class="topbar">
+            <div class="container py-2">
+                <div class="d-flex align-items-center justify-content-between flex-nowrap position-relative w-100">
+                    <!-- Logo -->
+                    <a class="navbar-brand m-0 flex-shrink-0" href="/"><span class="brand-icon">🖥️</span><span
+                            class="brand-text">CAEKT</span></a>
 
-                <!-- Category Button -->
-                <div class="category-wrap position-relative flex-shrink-0">
-                    <button class="category-btn" id="categoryToggle">
-                        <i class="bi bi-list"></i> <span class="d-none d-md-inline">Danh mục</span>
-                    </button>
-                    <div class="category-dropdown mt-2" id="categoryDropdown">
-                        @forelse(($featuredCategories ?? collect()) as $cat)
-                        <a class="category-item" href="{{ url('/category/' . $cat->slug) }}">
-                            <i class="bi bi-tag"></i> <span>{{ $cat->name }}</span>
-                        </a>
-                        @empty
-                        <div class="p-3 text-muted small">Chưa có danh mục</div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Search Form -->
-                <form action="{{ route('search') }}" method="GET" class="search-wrap flex-grow-1 mx-3" role="search">
-                    <div class="input-group">
-                        <input name="q" class="form-control" type="search" placeholder="Bạn cần tìm gì?"
-                            value="{{ request('q') }}">
-                        <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
-                    </div>
-                </form>
-
-                <!-- Right Side Items -->
-                <div class="d-flex align-items-center gap-3 flex-shrink-0">
-                    <!-- Mobile Menu -->
-                    <div class="d-flex d-lg-none align-items-center gap-3">
-                        <a href="{{ route('cart.index') }}" class="text-white fs-5">
-                            <i class="bi bi-cart"></i>
-                        </a>
-                        <a href="{{ route('login') }}" class="text-white fs-5">
-                            <i class="bi bi-person"></i>
-                        </a>
-                        @auth
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i> {{ auth()->user()->email }}</span></li>
-                            <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i> {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            @if(auth()->user()->role === 'admin')
-                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="bi bi-gear"></i> Trang Admin</a></li>
-                            @endif
-                            <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
-                                    @csrf
-                                    <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
-                                </form>
-                            </li>
-                        </ul>
-                        @endauth
+                    <!-- Category Button -->
+                    <div class="category-wrap position-relative flex-shrink-0">
+                        <button class="category-btn" id="categoryToggle">
+                            <i class="bi bi-list"></i> <span class="d-none d-md-inline">Danh mục</span>
+                        </button>
+                        <div class="category-dropdown mt-2" id="categoryDropdown">
+                            @forelse(($featuredCategories ?? collect()) as $cat)
+                                <a class="category-item" href="{{ url('/category/' . $cat->slug) }}">
+                                    <i class="bi bi-tag"></i> <span>{{ $cat->name }}</span>
+                                </a>
+                            @empty
+                                <div class="p-3 text-muted small">Chưa có danh mục</div>
+                            @endforelse
+                        </div>
                     </div>
 
-                    <!-- Desktop Menu -->
-                    <div class="d-none d-lg-flex align-items-center gap-4">
-                        <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span> <span
-                                class="value">1900.5301</span></div>
-                        <div class="info-item"><i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span
-                                class="value">Đơn hàng</span></div>
-                        <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative"
-                            id="cartLink">
-                            <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
-                            @php
-                            $cart = session('cart', []);
-                            $cartQty = collect($cart)->sum('qty');
-                            @endphp
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}"
-                                id="cartQtyBadge">{{ $cartQty }}</span>
-                        </a>
-                        <!-- Toggle Dark/Light Mode Switch -->
-                        <div id="theme-toggle" class="theme-switch">
-                            <div class="switch-track">
-                                <div class="switch-thumb">
-                                    <i class="bi bi-moon"></i>
+                    <!-- Search Form -->
+                    <form action="{{ route('search') }}" method="GET" class="search-wrap flex-grow-1 mx-3"
+                        role="search">
+                        <div class="input-group">
+                            <input name="q" class="form-control" type="search" placeholder="Bạn cần tìm gì?"
+                                value="{{ request('q') }}">
+                            <button class="btn btn-dark" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
+
+                    <!-- Right Side Items -->
+                    <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                        <!-- Mobile Menu -->
+                        <div class="d-flex d-lg-none align-items-center gap-3">
+                            <a href="{{ route('cart.index') }}" class="text-white fs-5">
+                                <i class="bi bi-cart"></i>
+                            </a>
+                            <a href="{{ route('login') }}" class="text-white fs-5">
+                                <i class="bi bi-person"></i>
+                            </a>
+                            @auth
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
+                                            {{ auth()->user()->email }}</span></li>
+                                    <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
+                                            {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    @if(auth()->user()->role === 'admin')
+                                        <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i
+                                                    class="bi bi-gear"></i> Trang Admin</a></li>
+                                    @endif
+                                    <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i
+                                                class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                            @csrf
+                                            <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            @endauth
+                        </div>
+
+                        <!-- Desktop Menu -->
+                        <div class="d-none d-lg-flex align-items-center gap-4">
+                            <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span>
+                                <span class="value">1900.5301</span>
+                            </div>
+                            <a href="{{ route('orders.lookup') }}" class="info-item text-decoration-none">
+                                <i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn
+                                    hàng</span>
+                            </a>
+                            <a href="{{ route('cart.index') }}" class="info-item text-decoration-none position-relative"
+                                id="cartLink">
+                                <i class="bi bi-cart" id="cartIcon"></i> <span class="value">Giỏ hàng</span>
+                                @php
+                                    $cart = session('cart', []);
+                                    $cartQty = collect($cart)->sum('qty');
+                                @endphp
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark {{ $cartQty > 0 ? '' : 'd-none' }}"
+                                    id="cartQtyBadge">{{ $cartQty }}</span>
+                            </a>
+                            <!-- Toggle Dark/Light Mode Switch -->
+                            <div id="theme-toggle" class="theme-switch">
+                                <div class="switch-track">
+                                    <div class="switch-thumb">
+                                        <i class="bi bi-moon"></i>
+                                    </div>
                                 </div>
                             </div>
+                            @auth
+                                @if(auth()->user()->role === 'admin')
+                                    {{-- Visible admin button on desktop header --}}
+                                    <a href="{{ route('admin.dashboard') }}"
+                                        class="btn btn-sm btn-warning text-dark d-none d-lg-inline me-2" title="Trang Admin">
+                                        <i class="bi bi-gear-fill"></i> Admin
+                                    </a>
+                                @endif
+                            @endauth
+                            @auth
+                                <div class="dropdown">
+                                    <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle"></i> <span
+                                            class="value">{{ auth()->user()->name }}</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
+                                                {{ auth()->user()->email }}</span></li>
+                                        <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
+                                                {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i
+                                                    class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá
+                                                nhân</a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                                @csrf
+                                                <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @else
+                                <a href="{{ route('login') }}" class="info-item text-decoration-none"><i
+                                        class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
+                            @endauth
                         </div>
-                        @auth
-                        <div class="dropdown">
-                            <a class="info-item text-decoration-none dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-circle"></i> <span
-                                    class="value">{{ auth()->user()->name }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
-                                        {{ auth()->user()->email }}</span></li>
-                                <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
-                                        {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
-                                        @csrf
-                                        <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                        @else
-                        <a href="{{ route('login') }}" class="info-item text-decoration-none"><i
-                                class="bi bi-person"></i> <span class="value">Đăng nhập</span></a>
-                        @endauth
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {{-- SUB BAR --}}
-    <div class="subbar">
-        <div class="container d-flex flex-wrap gap-3 py-2">
-            <span class="quick-item"><i class="bi bi-bag-check"></i> Mua PC tặng màn 240Hz</span>
-            <span class="quick-item"><i class="bi bi-fire"></i> Hot Deal</span>
-            <span class="quick-item"><i class="bi bi-laptop"></i> Laptop</span>
-            <span class="quick-item"><i class="bi bi-gear"></i> Dịch vụ kỹ thuật tại nhà</span>
-            <span class="quick-item"><i class="bi bi-arrow-left-right"></i> Thu cũ đổi mới</span>
-            <span class="quick-item"><i class="bi bi-shield-check"></i> Tra cứu bảo hành</span>
+        {{-- SUB BAR --}}
+        <div class="subbar">
+            <div class="container d-flex flex-wrap gap-3 py-2">
+                <span class="quick-item"><i class="bi bi-bag-check"></i> Mua PC tặng màn 240Hz</span>
+                <span class="quick-item"><i class="bi bi-fire"></i> Hot Deal</span>
+                <a href="{{ route('category.show', 'laptop') }}" class="quick-item text-decoration-none"><i
+                        class="bi bi-laptop"></i> Laptop</a>
+                <span class="quick-item"><i class="bi bi-gear"></i> Dịch vụ kỹ thuật tại nhà</span>
+                <span class="quick-item"><i class="bi bi-arrow-left-right"></i> Thu cũ đổi mới</span>
+                <span class="quick-item"><i class="bi bi-shield-check"></i> Tra cứu bảo hành</span>
+            </div>
         </div>
-    </div>
     </header>
 
     {{-- CONTENT --}}
     <main class="container mt-4">
-        @php $flashSuccess = session()->pull('success');
-        $flashError = session()->pull('error'); @endphp
-        @if ($flashSuccess)
-        <div class="alert alert-success">{{ $flashSuccess }}</div>
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         @endif
-        @if ($flashError)
-        <div class="alert alert-danger">{{ $flashError }}</div>
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         @endif
+
         @yield('content')
     </main>
+
+    <script>
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+            }
+        }, 5000);
+    </script>
 
     {{-- FOOTER --}}
     <footer>
@@ -751,7 +794,7 @@
     {{-- JS Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function() {
+        (function () {
             const badge = document.getElementById('cartQtyBadge');
             const cartIcon = document.getElementById('cartIcon');
 
@@ -821,7 +864,7 @@
         })();
     </script>
     <script>
-        (function() {
+        (function () {
             const toggle = document.getElementById('theme-toggle');
             if (!toggle) return;
             const html = document.documentElement;
@@ -851,18 +894,18 @@
         })();
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const wrap = document.querySelector('.category-wrap');
             const btn = document.getElementById('categoryToggle');
 
             // click nút để mở/đóng dropdown
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation(); // tránh click ngoài đóng
                 wrap.classList.toggle('active');
             });
 
             // click ra ngoài đóng dropdown
-            document.addEventListener('click', function() {
+            document.addEventListener('click', function () {
                 wrap.classList.remove('active');
             });
         });

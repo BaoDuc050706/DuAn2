@@ -12,12 +12,12 @@ class CategoryController extends Controller
     public function show($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
-        
+
         // Lấy sản phẩm với hình ảnh từ bảng product_images
         $products = DB::table('products as p')
             ->leftJoin('product_images as pi', function ($join) {
                 $join->on('pi.product_id', '=', 'p.id')
-                     ->where('pi.is_primary', '=', 1);
+                    ->where('pi.is_primary', '=', 1);
             })
             ->where('p.category_id', $category->id)
             ->select([
@@ -30,7 +30,8 @@ class CategoryController extends Controller
                 'p.connection',
                 'p.rgb',
                 'p.description',
-                DB::raw('pi.image_url as image'),
+                // Use product_images.image_url if present; otherwise fall back to products.image
+                DB::raw('COALESCE(pi.image_url, p.image) as image'),
             ])
             ->orderByDesc('p.created_at')
             ->get();

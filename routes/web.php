@@ -11,6 +11,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\OrderTrackingController;
 
 //admin
 use App\Http\Controllers\Admin\AdminController;
@@ -40,6 +41,7 @@ Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('categ
 // Auth - Login (demo)
 Route::get('/login', [LoginController::class, 'show'])->name('login');
 Route::post('/login', [LoginController::class, 'submit'])->name('login.submit');
+// Logout
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Auth - Register (demo)
@@ -58,6 +60,7 @@ Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.re
 Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
 Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 

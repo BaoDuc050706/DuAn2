@@ -15,6 +15,7 @@ class CategorySeeder extends Seeder
             ['name' => 'Bàn phím', 'slug' => 'ban-phim', 'featured' => true],
             ['name' => 'Màn hình', 'slug' => 'man-hinh', 'featured' => true],
             ['name' => 'Loa', 'slug' => 'loa', 'featured' => false],
+            ['name' => 'Laptop', 'slug' => 'laptop', 'featured' => true],
         ];
 
         foreach ($items as $it) {
