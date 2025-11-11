@@ -615,7 +615,8 @@
                                                     class="bi bi-gear"></i> Trang Admin</a></li>
                                     @endif
                                     <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i
+                                                class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
                                     </li>
                                     <li>
@@ -634,7 +635,8 @@
                         <!-- Desktop Menu -->
                         <div class="d-none d-lg-flex align-items-center gap-4">
                             <div class="info-item"><i class="bi bi-headphones"></i> <span class="label">Hotline</span>
-                                <span class="value">1900.5301</span></div>
+                                <span class="value">1900.5301</span>
+                            </div>
                             <a href="{{ route('orders.lookup') }}" class="info-item text-decoration-none">
                                 <i class="bi bi-receipt"></i> <span class="label">Tra cứu</span> <span class="value">Đơn
                                     hàng</span>
@@ -661,7 +663,8 @@
                             @auth
                                 @if(auth()->user()->role === 'admin')
                                     {{-- Visible admin button on desktop header --}}
-                                    <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-warning text-dark d-none d-lg-inline me-2" title="Trang Admin">
+                                    <a href="{{ route('admin.dashboard') }}"
+                                        class="btn btn-sm btn-warning text-dark d-none d-lg-inline me-2" title="Trang Admin">
                                         <i class="bi bi-gear-fill"></i> Admin
                                     </a>
                                 @endif
@@ -681,11 +684,12 @@
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
-                    <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                    <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
-                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá
-                        nhân</a>
-                    </li>
+                                        <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i
+                                                    class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá
+                                                nhân</a>
+                                        </li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
@@ -712,7 +716,8 @@
             <div class="container d-flex flex-wrap gap-3 py-2">
                 <span class="quick-item"><i class="bi bi-bag-check"></i> Mua PC tặng màn 240Hz</span>
                 <span class="quick-item"><i class="bi bi-fire"></i> Hot Deal</span>
-                <a href="{{ route('category.show', 'laptop') }}" class="quick-item text-decoration-none"><i class="bi bi-laptop"></i> Laptop</a>
+                <a href="{{ route('category.show', 'laptop') }}" class="quick-item text-decoration-none"><i
+                        class="bi bi-laptop"></i> Laptop</a>
                 <span class="quick-item"><i class="bi bi-gear"></i> Dịch vụ kỹ thuật tại nhà</span>
                 <span class="quick-item"><i class="bi bi-arrow-left-right"></i> Thu cũ đổi mới</span>
                 <span class="quick-item"><i class="bi bi-shield-check"></i> Tra cứu bảo hành</span>
@@ -722,46 +727,32 @@
 
     {{-- CONTENT --}}
     <main class="container mt-4">
-<<<<<<< HEAD
-        @php $flashSuccess = session()->pull('success');
-        $flashError = session()->pull('error'); @endphp
-        @if ($flashSuccess)
-            <div class="alert alert-success">{{ $flashSuccess }}</div>
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         @endif
-        @if ($flashError)
-            <div class="alert alert-danger">{{ $flashError }}</div>
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         @endif
+
         @yield('content')
     </main>
-=======
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
 
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    @yield('content')
-</main>
-
-<script>
-    // Tự động ẩn thông báo sau 5 giây
-    setTimeout(() => {
-        const alert = document.querySelector('.alert');
-        if (alert) {
-            alert.classList.remove('show');
-        }
-    }, 5000);
-</script>
-
->>>>>>> d669409cc3643ed414f77cf1d86e8d395373742f
+    <script>
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+            }
+        }, 5000);
+    </script>
 
     {{-- FOOTER --}}
     <footer>
@@ -803,7 +794,7 @@
     {{-- JS Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-         (function() {
+        (function () {
             const badge = document.getElementById('cartQtyBadge');
             const cartIcon = document.getElementById('cartIcon');
 
@@ -873,7 +864,7 @@
         })();
     </script>
     <script>
-         (function() {
+        (function () {
             const toggle = document.getElementById('theme-toggle');
             if (!toggle) return;
             const html = document.documentElement;
@@ -903,18 +894,18 @@
         })();
     </script>
     <script>
-         document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const wrap = document.querySelector('.category-wrap');
             const btn = document.getElementById('categoryToggle');
 
             // click nút để mở/đóng dropdown
-             btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.stopPropagation(); // tránh click ngoài đóng
                 wrap.classList.toggle('active');
             });
 
             // click ra ngoài đóng dropdown
-             document.addEventListener('click', function() {
+            document.addEventListener('click', function () {
                 wrap.classList.remove('active');
             });
         });
