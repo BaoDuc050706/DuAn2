@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\Mail as OrderMail;
 
 class PaymentController extends Controller
 {
@@ -141,6 +143,13 @@ class PaymentController extends Controller
 
 		// Clear cart after successful order
 		$request->session()->forget('cart');
+		// Gửi email xác nhận đơn hàng cho khách
+		try {
+			Mail::to($validated['email'])->send(new OrderMail($order));
+		} catch (\Exception $e) {
+			// Có thể ghi log nếu cần
+			\Log::error('Lỗi gửi mail xác nhận đơn hàng: ' . $e->getMessage());
+		}
 
 		return redirect()->route('home')
 			->with('success', 'Đơn hàng của bạn đã đặt thành công! Mã đơn: #' . $order['id']);

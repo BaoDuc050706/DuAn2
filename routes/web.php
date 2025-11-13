@@ -72,3 +72,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('/products', AdminProductController::class)->except(['show']);
 });
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [PaymentController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [PaymentController::class, 'process'])->name('checkout.process');
+});
+
