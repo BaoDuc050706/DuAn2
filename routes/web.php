@@ -12,6 +12,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\OrderTrackingController;
+use App\Http\Controllers\ChatBotController;
 
 //admin
 use App\Http\Controllers\Admin\AdminController;
@@ -63,6 +64,11 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+// Chatbot
+Route::post('/chatbot/ask', [ChatBotController::class, 'ask'])
+    ->middleware('throttle:20,1')
+    ->name('chatbot.ask');
 
 // Admin routes (require admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

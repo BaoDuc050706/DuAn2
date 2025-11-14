@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Gear Store')</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -553,6 +554,122 @@
         .dark-mode a:hover {
             color: #fff !important;
         }
+
+        /* Chatbot widget */
+        .chatbot-toggle {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            border: none;
+            background: #ff4c00;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, .2);
+            z-index: 1100;
+        }
+
+        .chatbot-panel {
+            position: fixed;
+            right: 24px;
+            bottom: 96px;
+            width: min(360px, calc(100vw - 32px));
+            height: 460px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 48px rgba(15, 23, 42, .25);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(24px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 1100;
+        }
+
+        .chatbot-panel.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #111, #2b2b2b);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #f5f7fb;
+        }
+
+        .chatbot-message {
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chatbot-message.user .bubble {
+            align-self: flex-end;
+            background: #111;
+            color: #fff;
+        }
+
+        .chatbot-message.bot .bubble {
+            align-self: flex-start;
+            background: #fff;
+            color: #111;
+            border: 1px solid #e5e7eb;
+        }
+
+        .chatbot-message .bubble {
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 92%;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+
+        .chatbot-input {
+            padding: 12px;
+            border-top: 1px solid #e5e7eb;
+            background: #fff;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chatbot-input textarea {
+            width: 100%;
+            resize: none;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        .chatbot-input button {
+            border: none;
+            border-radius: 12px;
+            background: #ff4c00;
+            color: #fff;
+            padding: 0 18px;
+            font-weight: 600;
+        }
+
+        .chatbot-input button:disabled {
+            opacity: 0.6;
+        }
     </style>
 </head>
 
@@ -791,6 +908,30 @@
         </div>
     </footer>
 
+    {{-- Chatbot widget --}}
+    <button class="chatbot-toggle" id="chatbotToggle" aria-label="Chat với CAEKT">
+        <i class="bi bi-chat-dots fs-4"></i>
+    </button>
+    <div class="chatbot-panel" id="chatbotPanel" aria-live="polite">
+        <div class="chatbot-header">
+            <div>
+                <div class="fw-semibold">CAEKT Assistant</div>
+                <small class="text-white-50">Hỏi mình mọi thắc mắc</small>
+            </div>
+            <button class="btn btn-sm btn-outline-light" id="chatbotClose" type="button">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chatbot-message bot">
+                <div class="bubble">Xin chào! Mình là trợ lý ảo của CAEKT. Bạn cần tư vấn sản phẩm hay kiểm tra đơn hàng?</div>
+            </div>
+        </div>
+        <form class="chatbot-input" id="chatbotForm">
+            @csrf
+            <textarea id="chatbotMessage" rows="1" placeholder="Nhập câu hỏi..." required></textarea>
+            <button type="submit" id="chatbotSubmit">Gửi</button>
+        </form>
+    </div>
+
     {{-- JS Bootstrap --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -909,6 +1050,129 @@
                 wrap.classList.remove('active');
             });
         });
+    </script>
+    <script>
+        (function () {
+            const toggleBtn = document.getElementById('chatbotToggle');
+            const closeBtn = document.getElementById('chatbotClose');
+            const panel = document.getElementById('chatbotPanel');
+            const form = document.getElementById('chatbotForm');
+            const textarea = document.getElementById('chatbotMessage');
+            const messages = document.getElementById('chatbotMessages');
+            const submitBtn = document.getElementById('chatbotSubmit');
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            if (!toggleBtn || !panel || !form || !messages || !textarea) {
+                return;
+            }
+
+            let isOpen = false;
+            let typingBubble = null;
+
+            const openPanel = () => {
+                panel.classList.add('active');
+                isOpen = true;
+                setTimeout(() => textarea.focus(), 150);
+            };
+
+            const closePanel = () => {
+                panel.classList.remove('active');
+                isOpen = false;
+            };
+
+            toggleBtn.addEventListener('click', () => {
+                isOpen ? closePanel() : openPanel();
+            });
+
+            closeBtn?.addEventListener('click', closePanel);
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && isOpen) {
+                    closePanel();
+                }
+            });
+
+            const appendMessage = (role, text) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = `chatbot-message ${role}`;
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.textContent = text;
+                wrapper.appendChild(bubble);
+                messages.appendChild(wrapper);
+                messages.scrollTop = messages.scrollHeight;
+                return bubble;
+            };
+
+            const setLoading = (state) => {
+                submitBtn.disabled = state;
+                textarea.disabled = state;
+            };
+
+            const resetTyping = () => {
+                if (typingBubble) {
+                    typingBubble.remove();
+                    typingBubble = null;
+                }
+            };
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const message = textarea.value.trim();
+                if (!message) {
+                    return;
+                }
+
+                appendMessage('user', message);
+                textarea.value = '';
+                textarea.style.height = 'auto';
+                setLoading(true);
+
+                typingBubble = appendMessage('bot', 'Đang soạn câu trả lời...');
+                typingBubble.classList.add('text-muted');
+
+                try {
+                    const response = await fetch('{{ route('chatbot.ask') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                        },
+                        body: JSON.stringify({ message }),
+                    });
+
+                    const data = await response.json();
+
+                    resetTyping();
+
+                    if (!response.ok) {
+                        const errorMsg = data.message || 'Máy chủ từ chối yêu cầu. Vui lòng thử lại.';
+                        appendMessage('bot', errorMsg);
+                        return;
+                    }
+
+                    appendMessage('bot', data.reply || 'Mình chưa có câu trả lời phù hợp, bạn thử hỏi lại nhé!');
+                } catch (error) {
+                    resetTyping();
+                    appendMessage('bot', 'Không thể kết nối tới chatbot. Bạn kiểm tra lại mạng giúp mình nhé!');
+                } finally {
+                    setLoading(false);
+                }
+            });
+
+            textarea.addEventListener('input', () => {
+                textarea.style.height = 'auto';
+                textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+            });
+
+            textarea.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    form.requestSubmit();
+                }
+            });
+        })();
     </script>
 
 </body>
