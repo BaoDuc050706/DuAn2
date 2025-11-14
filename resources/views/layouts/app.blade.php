@@ -12,9 +12,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -50,11 +58,16 @@
             color: #fff !important;
         }
 
+        main {
+            flex: 1 0 auto;
+        }
+
         footer {
             background-color: #222;
             color: #ccc;
             padding: 40px 0;
             margin-top: 60px;
+            flex-shrink: 0;
         }
 
         footer a {
@@ -164,20 +177,22 @@
             border: 1px solid #eee;
             border-radius: .5rem;
             box-shadow: 0 10px 24px rgba(0, 0, 0, .08);
-            min-width: 320px;
+            min-width: 200px;
+            max-width: 280px;
             width: auto;
             display: none;
+            margin-top: 8px;
         }
 
         .category-item {
-            padding: 12px 16px 12px 20px;
+            padding: 10px 14px 10px 16px;
             display: flex;
             align-items: center;
             justify-content: flex-start;
             gap: 0.5rem;
             text-decoration: none;
             color: #222;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
             transition: background-color 0.2s ease;
         }
@@ -344,18 +359,36 @@
             /* đổi màu nền nhẹ */
         }
 
-        /* dropdown ẩn mặc định */
-        .category-dropdown {
-            position: fixed !important;
-            top: 60px !important;
-            /* đúng dưới header */
-            left: 0 !important;
-            width: 100vw !important;
-            border: none !important;
-            border-radius: 0 !important;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
-            background: #fff !important;
-            z-index: 2000;
+        /* dropdown trên desktop - giữ nguyên nhỏ gọn */
+        @media (min-width: 992px) {
+            .category-dropdown {
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                width: auto !important;
+                min-width: 200px !important;
+                max-width: 280px !important;
+                border: 1px solid #eee !important;
+                border-radius: .5rem !important;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, .08) !important;
+                margin-top: 8px !important;
+            }
+        }
+
+        /* dropdown trên tablet - nhỏ gọn */
+        @media (min-width: 769px) and (max-width: 991px) {
+            .category-dropdown {
+                position: absolute !important;
+                top: 100% !important;
+                left: 0 !important;
+                width: auto !important;
+                min-width: 200px !important;
+                max-width: 280px !important;
+                border: 1px solid #eee !important;
+                border-radius: .5rem !important;
+                box-shadow: 0 10px 24px rgba(0, 0, 0, .08) !important;
+                margin-top: 8px !important;
+            }
         }
 
 
@@ -397,35 +430,53 @@
                 font-size: 1.4rem;
             }
 
-            .topbar .d-flex {
+            .topbar .container > .d-flex {
+                position: relative;
                 flex-wrap: wrap !important;
                 gap: .5rem;
             }
 
-            /* Mobile layout: Logo và Category trên cùng */
-            .topbar .navbar-brand {
+            /* Mobile layout: 
+               Dòng 1: Cart+User (trái) | Logo CAEKT (giữa) | Category (phải)
+               Dòng 2: Search bar (full width)
+            */
+
+            /* Cart và User icons - bên trái */
+            .topbar .d-flex>div:last-child {
                 order: 1;
                 flex: 0 0 auto;
+                width: auto;
             }
 
-            .topbar .category-wrap {
+            /* Logo CAEKT - giữa, ở dòng đầu */
+            .topbar .navbar-brand {
                 order: 2;
                 flex: 0 0 auto;
+                position: absolute;
+                left: 50%;
+                top: 0;
+                transform: translateX(-50%);
+                z-index: 10;
+                width: auto;
             }
 
-            /* Search bar trên dòng thứ 2 */
-            .topbar .search-wrap {
+            /* Category button - bên phải */
+            .topbar .category-wrap {
                 order: 3;
+                flex: 0 0 auto;
+                width: auto;
+                margin-left: auto;
+            }
+
+            /* Search bar trên dòng thứ 2 - full width, có khoảng cách đủ để không bị che */
+            .topbar .search-wrap {
+                order: 4;
                 flex: 1 1 100% !important;
                 min-width: 100% !important;
                 max-width: 100% !important;
                 margin: 0 !important;
-            }
-
-            /* Right side items trên dòng thứ 2 */
-            .topbar .d-flex>div:last-child {
-                order: 4;
-                flex: 0 0 auto;
+                margin-top: 1rem;
+                padding-top: 0.5rem;
             }
 
             /* Danh mục trên mobile chỉ hiển thị icon 3 gạch */
@@ -442,7 +493,7 @@
             }
 
 
-            /* Dropdown danh mục không kéo header xuống */
+            /* Dropdown trên mobile nhỏ (tablet/phone) - hiển thị bên phải */
             @media (max-width: 768px) {
                 .category-dropdown {
                     position: absolute !important;
@@ -450,9 +501,8 @@
                     right: 0 !important;
                     left: auto !important;
                     width: max-content !important;
-                    /* ✅ chỉ vừa đủ chữ */
                     min-width: 180px !important;
-                    /* đảm bảo không quá hẹp */
+                    max-width: 250px !important;
                     background: #fff !important;
                     border: 1px solid #eee !important;
                     border-radius: 8px !important;
@@ -715,37 +765,43 @@
                             <a href="{{ route('cart.index') }}" class="text-white fs-5">
                                 <i class="bi bi-cart"></i>
                             </a>
-                            <a href="{{ route('login') }}" class="text-white fs-5">
-                                <i class="bi bi-person"></i>
-                            </a>
                             @auth
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
-                                            {{ auth()->user()->email }}</span></li>
-                                    <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
-                                            {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    @if(auth()->user()->role === 'admin')
-                                        <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i
-                                                    class="bi bi-gear"></i> Trang Admin</a></li>
-                                    @endif
-                                    <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i
-                                                class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
-                                            @csrf
-                                            <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                <div class="dropdown">
+                                    <a class="text-white fs-5 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><span class="dropdown-item-text"><i class="bi bi-envelope"></i>
+                                                {{ auth()->user()->email }}</span></li>
+                                        <li><span class="dropdown-item-text"><i class="bi bi-telephone"></i>
+                                                {{ auth()->user()->phone ?? 'Chưa có SĐT' }}</span></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        @if(auth()->user()->role === 'admin')
+                                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i
+                                                        class="bi bi-gear"></i> Trang Admin</a></li>
+                                        @endif
+                                        <li><a class="dropdown-item" href="{{ route('home') }}">Trang chủ</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('orders.index') }}"><i
+                                                    class="bi bi-list-ul"></i> Lịch sử mua hàng</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Thông tin cá nhân</a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form method="post" action="{{ route('logout') }}" class="px-3 py-1">
+                                                @csrf
+                                                <button class="btn btn-link p-0 text-danger">Đăng xuất</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            @else
+                                <a href="{{ route('login') }}" class="text-white fs-5">
+                                    <i class="bi bi-person"></i>
+                                </a>
                             @endauth
                         </div>
 
