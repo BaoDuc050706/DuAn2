@@ -13,6 +13,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\ChatBotController;
+use App\Http\Controllers\CheckoutController;
 
 //admin
 use App\Http\Controllers\Admin\AdminController;
@@ -23,11 +24,13 @@ Route::redirect('/', '/home');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// Checkout routes (require login)
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [PaymentController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [PaymentController::class, 'process'])->name('checkout.process');
-    // Order history
+});
+
+// Order history
+Route::middleware('auth')->group(function () {
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
 });
 
@@ -78,8 +81,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('/products', AdminProductController::class)->except(['show']);
 });
-Route::middleware('auth')->group(function () {
-    Route::get('/checkout', [PaymentController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout', [PaymentController::class, 'process'])->name('checkout.process');
-});
+
 

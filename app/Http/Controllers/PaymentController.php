@@ -17,13 +17,63 @@ class PaymentController extends Controller
 			$name = (string) $request->query('name', 'Sản phẩm');
 			$price = (int) $request->query('price', 0);
 			$qty = (int) $request->query('qty', 1);
+			$productId = (int) $request->query('product_id', 0);
+			$slug = (string) $request->query('slug', '');
+			
+			// Lấy variants nếu có
+			$variantRam = (string) $request->query('variant_ram', '');
+			$variantSsd = (string) $request->query('variant_ssd', '');
+			$variantColor = (string) $request->query('variant_color', '');
+			$variantSwitch = (string) $request->query('variant_switch', '');
+			
 			if ($qty < 1) {
 				$qty = 1;
 			}
 			if ($qty > 20) {
 				$qty = 20;
 			}
-			$cartItems = [['name' => $name, 'qty' => $qty, 'price' => $price]];
+			
+			// ✅ Lấy giỏ hàng hiện tại thay vì reset
+			$cart = $request->session()->get('cart', []);
+			
+			// ✅ Tạo key unique từ product_id + variants
+			$variantKey = $productId . '|' . $variantRam . '|' . $variantSsd . '|' . $variantColor . '|' . $variantSwitch;
+			
+			// ✅ Kiểm tra sản phẩm đã có chưa với cùng variants
+			$existingIndex = collect($cart)->search(function($item) use ($productId, $variantKey) {
+				if ($productId > 0 && isset($item['product_id']) && (int)$item['product_id'] > 0) {
+					$itemVariantKey = (isset($item['product_id']) ? $item['product_id'] : 0) . '|' . 
+									  (isset($item['variant_ram']) ? $item['variant_ram'] : '') . '|' . 
+									  (isset($item['variant_ssd']) ? $item['variant_ssd'] : '') . '|' . 
+									  (isset($item['variant_color']) ? $item['variant_color'] : '') . '|' . 
+									  (isset($item['variant_switch']) ? $item['variant_switch'] : '');
+					return $itemVariantKey === $variantKey;
+				}
+				return false;
+			});
+			
+			if ($existingIndex !== false) {
+				// ✅ Nếu đã có -> tăng số lượng
+				$cart[$existingIndex]['qty'] += $qty;
+				if ($cart[$existingIndex]['qty'] > 20) {
+					$cart[$existingIndex]['qty'] = 20;
+				}
+			} else {
+				// ✅ Nếu chưa có -> thêm mới với đầy đủ variant info
+				$cart[] = [
+					'product_id' => $productId,
+					'name' => $name, 
+					'qty' => $qty, 
+					'price' => $price,
+					'slug' => $slug,
+					'variant_ram' => $variantRam,
+					'variant_ssd' => $variantSsd,
+					'variant_color' => $variantColor,
+					'variant_switch' => $variantSwitch,
+				];
+			}
+			
+			$cartItems = array_values($cart);
 			// persist to session cart
 			$request->session()->put('cart', $cartItems);
 		} else {
@@ -49,10 +99,13 @@ class PaymentController extends Controller
 			return $carry + ($item['qty'] * $item['price']);
 		}, 0);
 
-		$shipping = $subtotal >= 2000000 ? 0 : 30000;
+		$shipping = $subtotal >= 2000000 ? 0 : 60000;
 		$total = $subtotal + $shipping;
 
-		return view('checkout', compact('cartItems', 'subtotal', 'shipping', 'total'));
+		// QR data demo - sử dụng ASCII safe characters để tránh lỗi encoding
+		$fakeQrData = 'Ngan hang ABC - STK 123456789 - Thanh toan don hang - Tong tien: ' . $total . 'd';
+
+		return view('checkout', compact('cartItems', 'subtotal', 'shipping', 'total', 'fakeQrData'));
 	}
 
 	public function process(Request $request): RedirectResponse
@@ -75,7 +128,7 @@ class PaymentController extends Controller
 			return $carry + ($item['qty'] * $item['price']);
 		}, 0);
 
-		$shipping = $subtotal >= 2000000 ? 0 : 30000;
+		$shipping = $subtotal >= 2000000 ? 0 : 60000;
 		$total = $subtotal + $shipping;
 
 		// Tạo đơn hàng
@@ -119,7 +172,7 @@ class PaymentController extends Controller
 		$subtotal = collect($cartItems)->reduce(function ($carry, $item) {
 			return $carry + ((int) ($item['qty'] ?? 1) * (int) ($item['price'] ?? 0));
 		}, 0);
-		$shipping = $subtotal >= 2000000 ? 0 : 30000;
+		$shipping = $subtotal >= 2000000 ? 0 : 60000;
 		$total = $subtotal + $shipping;
 
 		$order = [
@@ -151,7 +204,16 @@ class PaymentController extends Controller
 			\Log::error('Lỗi gửi mail xác nhận đơn hàng: ' . $e->getMessage());
 		}
 
+		// Thông báo khác nhau tùy theo phương thức thanh toán
+		if ($validated['payment_method'] === 'bank') {
+			$message = 'Chuyển khoản thành công! Mã đơn: #' . $order['id'] . ' - Cảm ơn bạn đã mua hàng!';
+		} elseif ($validated['payment_method'] === 'card') {
+			$message = 'Thanh toán bằng thẻ thành công! Mã đơn: #' . $order['id'] . ' - Cảm ơn bạn đã mua hàng!';
+		} else {
+			$message = 'Đơn hàng của bạn đã đặt thành công! Mã đơn: #' . $order['id'];
+		}
+
 		return redirect()->route('home')
-			->with('success', 'Đơn hàng của bạn đã đặt thành công! Mã đơn: #' . $order['id']);
+			->with('success', $message);
 	}
 }

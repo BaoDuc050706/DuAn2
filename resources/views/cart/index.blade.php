@@ -24,6 +24,24 @@
                         <div>
                             <div class="fw-semibold">{{ $item['name'] }}</div>
                             <div class="small text-muted">{{ number_format($item['price'], 0, ',', '.') }}₫ / sp</div>
+                            
+                            {{-- Hiển thị các variant nếu có --}}
+                            @if(!empty($item['variant_ram']) || !empty($item['variant_ssd']) || !empty($item['variant_color']) || !empty($item['variant_switch']))
+                                <div class="small text-secondary mt-1">
+                                    @if(!empty($item['variant_ram']))
+                                        <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ram']) }}</span>
+                                    @endif
+                                    @if(!empty($item['variant_ssd']))
+                                        <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ssd']) }}</span>
+                                    @endif
+                                    @if(!empty($item['variant_color']))
+                                        <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_color'])) }}</span>
+                                    @endif
+                                    @if(!empty($item['variant_switch']))
+                                        <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_switch'])) }}</span>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <form method="post" action="{{ route('cart.dec', $index) }}">
