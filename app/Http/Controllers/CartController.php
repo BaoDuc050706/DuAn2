@@ -22,15 +22,41 @@ class CartController extends Controller
     /**
      * Thêm sản phẩm vào giỏ hàng
      */
-    public function add(Request $request): RedirectResponse
+    public function add(Request $request)
     {
-        $productId = (int) $request->input('product_id');
+        $productId = (int) $request->input('product_id', 0);
+        $slug = $request->input('slug', '');
+        $name = (string) $request->input('name', '');
+        $price = (int) $request->input('price', 0);
+        
+        // Lấy các variant nếu có
+        $variantRam = $request->input('variant_ram', '');
+        $variantSsd = $request->input('variant_ssd', '');
+        $variantColor = $request->input('variant_color', '');
+        $variantSwitch = $request->input('variant_switch', '');
+        
         $cart = $request->session()->get('cart', []);
 
-        // ✅ Chỉ kiểm tra theo product_id
-        $existingIndex = collect($cart)->search(fn($item) =>
-            (int) $item['product_id'] === $productId
-        );
+        // ✅ Tạo key unique từ product_id + variants
+        $variantKey = $productId . '|' . $variantRam . '|' . $variantSsd . '|' . $variantColor . '|' . $variantSwitch;
+
+        // ✅ Kiểm tra theo product_id + variants
+        $existingIndex = collect($cart)->search(function($item) use ($productId, $name, $price, $variantKey) {
+            if ($productId > 0 && isset($item['product_id']) && (int)$item['product_id'] > 0) {
+                // Kiểm tra product_id và variants
+                $itemVariantKey = (isset($item['product_id']) ? $item['product_id'] : 0) . '|' . 
+                                  (isset($item['variant_ram']) ? $item['variant_ram'] : '') . '|' . 
+                                  (isset($item['variant_ssd']) ? $item['variant_ssd'] : '') . '|' . 
+                                  (isset($item['variant_color']) ? $item['variant_color'] : '') . '|' . 
+                                  (isset($item['variant_switch']) ? $item['variant_switch'] : '');
+                return $itemVariantKey === $variantKey;
+            }
+            // Fallback: kiểm tra theo name và price
+            if (!empty($name) && (int)$item['price'] === $price) {
+                return $item['name'] === $name;
+            }
+            return false;
+        });
 
         if ($existingIndex !== false) {
             // ✅ Nếu đã có -> tăng số lượng
@@ -39,10 +65,14 @@ class CartController extends Controller
             // ✅ Nếu chưa có -> thêm mới
             $cart[] = [
                 'product_id' => $productId,
-                'name'       => $request->input('name'),
-                'price'      => (int) $request->input('price'),
+                'name'       => $name,
+                'price'      => $price,
                 'qty'        => (int) $request->input('qty', 1),
-                'slug'       => $request->input('slug'),
+                'slug'       => $slug,
+                'variant_ram' => $variantRam,
+                'variant_ssd' => $variantSsd,
+                'variant_color' => $variantColor,
+                'variant_switch' => $variantSwitch,
             ];
         }
 
@@ -51,6 +81,15 @@ class CartController extends Controller
 
         // ✅ Lưu lại giỏ hàng
         $request->session()->put('cart', $cart);
+
+        // Kiểm tra nếu là AJAX request thì return JSON
+        if ($request->expectsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã thêm sản phẩm vào giỏ hàng!',
+                'cart_count' => count($cart)
+            ]);
+        }
 
         return redirect()->route('cart.index')
                          ->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');

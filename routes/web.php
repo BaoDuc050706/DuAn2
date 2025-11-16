@@ -12,6 +12,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\OrderTrackingController;
+use App\Http\Controllers\ChatBotController;
+use App\Http\Controllers\CheckoutController;
 
 //admin
 use App\Http\Controllers\Admin\AdminController;
@@ -22,11 +24,13 @@ Route::redirect('/', '/home');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// Checkout routes (require login)
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [PaymentController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [PaymentController::class, 'process'])->name('checkout.process');
-    // Order history
+});
+
+// Order history
+Route::middleware('auth')->group(function () {
     Route::get('/orders', [\App\Http\Controllers\OrderController::class, 'index'])->name('orders.index');
 });
 
@@ -64,6 +68,11 @@ Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear')
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
+// Chatbot
+Route::post('/chatbot/ask', [ChatBotController::class, 'ask'])
+    ->middleware('throttle:20,1')
+    ->name('chatbot.ask');
+
 // Admin routes (require admin role)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
@@ -72,3 +81,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('/products', AdminProductController::class)->except(['show']);
 });
+
+

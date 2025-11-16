@@ -10,11 +10,13 @@ use Illuminate\Support\Str;
 {{-- Hero section --}}
 <section class="hero p-5 mb-4 rounded">
     <div class="container-fluid py-5">
-        <span class="badge">HOT SALE</span>
+        <span class="badge">
+            <a href="#hot-deal" class="text-decoration-none text-white">HOT SALE</a>
+        </span>
         <h1 class="display-6 fw-bold mt-2">Nâng tầm trải nghiệm gaming cùng CAEKT</h1>
         <p class="col-md-8 fs-5 text-white-50">Ưu đãi phụ kiện gaming chính hãng. Giao nhanh, bảo hành 1 đổi 1.</p>
         <div class="d-flex gap-2">
-            <a href="/products" class="btn btn-danger btn-lg">
+            <a href="#featured-products" class="btn btn-danger btn-lg">
                 <i class="bi bi-lightning-fill"></i> Mua ngay
             </a>
             <a href="{{ route('checkout.index') }}" class="btn btn-outline-light btn-lg">
@@ -46,7 +48,7 @@ use Illuminate\Support\Str;
 
 
 {{-- Featured products --}}
-<section class="mb-4">
+<section class="mb-4" id="featured-products">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="h5 mb-0 section-title">
             @if(isset($activeCategory))
@@ -93,7 +95,7 @@ use Illuminate\Support\Str;
     <div class="row g-3">
         @forelse($products as $product)
         <div class="col-6 col-md-3">
-            <div class="card h-100 product-card">
+            <div class="card h-100 product-card position-relative">
                 <a href="{{ route('product.show', $product->slug) }}">
                     @php
                     $img = $product->image;
@@ -103,6 +105,16 @@ use Illuminate\Support\Str;
                     @endphp
                     <img src="{{ $img ?: 'https://via.placeholder.com/400x300?text=Product' }}" class="card-img-top" alt="{{ $product->name }}">
                 </a>
+                
+                {{-- Badge giảm giá --}}
+                @if(isset($product->discount) && $product->discount > 0)
+                <div class="position-absolute top-0 end-0 m-2">
+                    <span class="badge bg-danger" style="font-size: 0.9rem; padding: 0.5rem 0.75rem;">
+                        <i class="bi bi-star-fill"></i> -{{ $product->discount }}%
+                    </span>
+                </div>
+                @endif
+                
                 <div class="card-body d-flex flex-column">
                     <h3 class="h6"><a class="text-decoration-none text-dark"
                             href="{{ route('product.show', $product->slug) }}">{{ $product->name }}</a></h3>
@@ -117,21 +129,13 @@ use Illuminate\Support\Str;
                     <div class="price mb-2">{{ number_format($product->price, 0, ',', '.') }}₫</div>
                     @endif
                     <div class="d-flex gap-2 mt-auto">
-                        <form method="post" action="{{ route('cart.add') }}" class="add-to-cart-form">
-
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="name" value="{{ $product->name }}">
-                        <input type="hidden" name="price" value="{{ (int)$product->price }}">
-                        <input type="hidden" name="qty" value="1">
-                        <input type="hidden" name="slug" value="{{ $product->slug }}">
-                        <button class="btn btn-outline-dark" type="submit">Thêm vào giỏ hàng</button>
-</form>
-
-
-                        <a class="btn btn-danger"
-                            href="{{ route('checkout.index', ['buy_now' => 1, 'name' => $product->name, 'price' => $product->price, 'qty' => 1]) }}">Mua
-                            ngay</a>
+                        <a class="btn btn-danger w-100" href="{{ route('product.show', $product->slug) }}">
+                            <i class="bi bi-lightning-fill"></i> Mua ngay
+                        </a>
+                    </div>
+                    <div class="mt-2 text-center small text-muted">
+                        <i class="bi bi-bag-check"></i> 
+                        {{ isset($product->sold) ? number_format($product->sold) : rand(50, 500) }} sản phẩm đã bán
                     </div>
                 </div>
             </div>
