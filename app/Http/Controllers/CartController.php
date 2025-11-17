@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
 
 class CartController extends Controller
 {
@@ -14,6 +15,28 @@ class CartController extends Controller
     public function index(Request $request): View
     {
         $cartItems = $request->session()->get('cart', []);
+
+        $missingImageIds = collect($cartItems)
+            ->filter(fn($item) => empty($item['image']) && !empty($item['product_id']))
+            ->pluck('product_id')
+            ->unique()
+            ->filter()
+            ->values();
+
+        if ($missingImageIds->isNotEmpty()) {
+            $images = Product::whereIn('id', $missingImageIds->all())
+                ->pluck('image', 'id');
+
+            foreach ($cartItems as $idx => $item) {
+                $pid = $item['product_id'] ?? null;
+                if (!empty($pid) && empty($item['image']) && isset($images[$pid])) {
+                    $cartItems[$idx]['image'] = $images[$pid];
+                }
+            }
+
+            $request->session()->put('cart', $cartItems);
+        }
+
         $total = collect($cartItems)->sum(fn($item) => $item['price'] * $item['qty']);
 
         return view('cart.index', compact('cartItems', 'total'));
@@ -28,6 +51,15 @@ class CartController extends Controller
         $slug = $request->input('slug', '');
         $name = (string) $request->input('name', '');
         $price = (int) $request->input('price', 0);
+        $image = (string) $request->input('image', '');
+
+        $productModel = null;
+        if ($productId > 0) {
+            $productModel = Product::find($productId);
+        }
+        if (empty($image) && $productModel) {
+            $image = (string) ($productModel->image ?? '');
+        }
 
         // Lấy các variant nếu có
         $variantRam = $request->input('variant_ram', '');
@@ -64,21 +96,18 @@ class CartController extends Controller
             $desiredQty = $cart[$existingIndex]['qty'] + $addQty;
 
             // If product_id available, enforce stock limits
-            if ($productId > 0) {
-                $prod = \App\Models\Product::find($productId);
-                if ($prod) {
-                    $available = (int) $prod->stock;
-                    if ($desiredQty > $available) {
-                        // If strict mode requested, return error
-                        if ($request->boolean('strict_stock')) {
-                            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
-                        }
-
-                        // Otherwise cap to available and notify
-                        $cart[$existingIndex]['qty'] = $available;
-                        $request->session()->put('cart', array_values($cart));
-                        return redirect()->route('cart.index')->with('warning', 'Số lượng sản phẩm đã được điều chỉnh về tồn kho hiện có: ' . $available);
+            if ($productModel) {
+                $available = (int) $productModel->stock;
+                if ($desiredQty > $available) {
+                    // If strict mode requested, return error
+                    if ($request->boolean('strict_stock')) {
+                        return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
                     }
+
+                    // Otherwise cap to available and notify
+                    $cart[$existingIndex]['qty'] = $available;
+                    $request->session()->put('cart', array_values($cart));
+                    return redirect()->route('cart.index')->with('warning', 'Số lượng sản phẩm đã được điều chỉnh về tồn kho hiện có: ' . $available);
                 }
             }
 
@@ -87,19 +116,16 @@ class CartController extends Controller
             // ✅ Nếu chưa có -> thêm mới
             $initialQty = (int) $request->input('qty', 1);
             // If product_id present, enforce stock limits when adding
-            if ($productId > 0) {
-                $prod = \App\Models\Product::find($productId);
-                if ($prod) {
-                    $available = (int) $prod->stock;
-                    if ($initialQty > $available) {
-                        if ($request->boolean('strict_stock')) {
-                            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
-                        }
-                        // cap to available
-                        $initialQty = $available;
-                        // notify user
-                        $request->session()->flash('warning', 'Số lượng sản phẩm đã được điều chỉnh về tồn kho hiện có: ' . $available);
+            if ($productModel) {
+                $available = (int) $productModel->stock;
+                if ($initialQty > $available) {
+                    if ($request->boolean('strict_stock')) {
+                        return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
                     }
+                    // cap to available
+                    $initialQty = $available;
+                    // notify user
+                    $request->session()->flash('warning', 'Số lượng sản phẩm đã được điều chỉnh về tồn kho hiện có: ' . $available);
                 }
             }
 
@@ -113,6 +139,7 @@ class CartController extends Controller
                 'variant_ssd' => $variantSsd,
                 'variant_color' => $variantColor,
                 'variant_switch' => $variantSwitch,
+                'image'       => $image,
             ];
         }
 
@@ -145,7 +172,7 @@ class CartController extends Controller
             $productId = isset($cart[$index]['product_id']) ? (int)$cart[$index]['product_id'] : 0;
             $newQty = $cart[$index]['qty'] + 1;
             if ($productId > 0) {
-                $prod = \App\Models\Product::find($productId);
+                $prod = Product::find($productId);
                 if ($prod) {
                     $available = (int)$prod->stock;
                     if ($newQty > $available) {

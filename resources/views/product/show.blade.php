@@ -24,6 +24,7 @@
                 <input type="hidden" name="name" value="{{ $product->name }}">
                 <input type="hidden" name="price" id="final_price" value="{{ (int)$product->price }}">
                 <input type="hidden" name="slug" value="{{ $product->slug }}">
+                <input type="hidden" name="image" value="{{ $product->image }}">
                 
                 <div class="mb-3">
                     <h5>Giá: <span class="text-danger" id="display_price">{{ number_format($product->price, 0, ',', '.') }}₫</span></h5>

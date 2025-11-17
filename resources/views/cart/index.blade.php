@@ -20,30 +20,50 @@
             @else
                 {{-- Danh sách sản phẩm --}}
                 @foreach($cartItems as $index => $item)
-                    <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
-                        <div>
-                            <div class="fw-semibold">{{ $item['name'] }}</div>
-                            <div class="small text-muted">{{ number_format($item['price'], 0, ',', '.') }}₫ / sp</div>
-                            
-                            {{-- Hiển thị các variant nếu có --}}
-                            @if(!empty($item['variant_ram']) || !empty($item['variant_ssd']) || !empty($item['variant_color']) || !empty($item['variant_switch']))
-                                <div class="small text-secondary mt-1">
-                                    @if(!empty($item['variant_ram']))
-                                        <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ram']) }}</span>
-                                    @endif
-                                    @if(!empty($item['variant_ssd']))
-                                        <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ssd']) }}</span>
-                                    @endif
-                                    @if(!empty($item['variant_color']))
-                                        <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_color'])) }}</span>
-                                    @endif
-                                    @if(!empty($item['variant_switch']))
-                                        <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_switch'])) }}</span>
-                                    @endif
-                                </div>
-                            @endif
+                    @php
+                        $imageRaw = $item['image'] ?? '';
+                        $imageUrl = null;
+
+                        if ($imageRaw && \Illuminate\Support\Str::startsWith($imageRaw, ['http://', 'https://'])) {
+                            $imageUrl = $imageRaw;
+                        } elseif ($imageRaw && \Illuminate\Support\Str::startsWith($imageRaw, ['/'])) {
+                            $imageUrl = asset(ltrim($imageRaw, '/'));
+                        } elseif (!empty($imageRaw)) {
+                            $imageUrl = asset('image/' . rawurlencode($imageRaw));
+                        }
+                    @endphp
+                    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-start align-items-md-center py-3 border-bottom">
+                        <div class="d-flex gap-3 align-items-center w-100">
+                            <div class="flex-shrink-0">
+                                <img src="{{ $imageUrl ?: 'https://via.placeholder.com/80x80?text=No+Image' }}"
+                                    alt="{{ $item['name'] }}"
+                                    class="rounded shadow-sm"
+                                    style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{{ $item['name'] }}</div>
+                                <div class="small text-muted">{{ number_format($item['price'], 0, ',', '.') }}₫ / sp</div>
+                                
+                                {{-- Hiển thị các variant nếu có --}}
+                                @if(!empty($item['variant_ram']) || !empty($item['variant_ssd']) || !empty($item['variant_color']) || !empty($item['variant_switch']))
+                                    <div class="small text-secondary mt-1">
+                                        @if(!empty($item['variant_ram']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ram']) }}</span>
+                                        @endif
+                                        @if(!empty($item['variant_ssd']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ssd']) }}</span>
+                                        @endif
+                                        @if(!empty($item['variant_color']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_color'])) }}</span>
+                                        @endif
+                                        @if(!empty($item['variant_switch']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_switch'])) }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center gap-2 flex-wrap ms-md-auto">
                             <form method="post" action="{{ route('cart.dec', $index) }}">
                                 @csrf
                                 @method('PATCH')

@@ -66,6 +66,7 @@
                                     <input type="hidden" name="price" value="{{ (int)$product->price }}">
                                     <input type="hidden" name="qty" value="1">
                                     <input type="hidden" name="slug" value="{{ $product->slug }}">
+                                    <input type="hidden" name="image" value="{{ $product->image }}">
                                     <button class="btn btn-outline-dark" type="submit">Thêm vào giỏ hàng</button>
                                 </form>
                                 <a class="btn btn-danger"
