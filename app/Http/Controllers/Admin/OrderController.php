@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -43,9 +46,36 @@ class OrderController extends Controller
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
         ]);
 
-        $order->update(['status' => $request->status]);
+        $newStatus = $request->status;
+        $oldStatus = $order->status;
 
-        return redirect()->back()
-            ->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
+        DB::beginTransaction();
+        try {
+            // Cập nhật trạng thái đơn hàng
+            $order->update(['status' => $newStatus]);
+
+            // Nếu đơn hàng chuyển sang trạng thái "delivered" thì giảm tồn kho
+            if ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
+                $items = $order->items ?? [];
+                foreach ($items as $item) {
+                    $productId = $item['product_id'] ?? null;
+                    $quantity = (int) ($item['qty'] ?? 0);
+
+                    if ($productId && $quantity > 0) {
+                        Product::where('id', $productId)
+                            ->decrement('stock', $quantity);
+                    }
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()
+                ->with('success', 'Cập nhật trạng thái đơn hàng thành công! Tồn kho đã được cập nhật.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating order status: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Có lỗi xảy ra khi cập nhật trạng thái: ' . $e->getMessage());
+        }
     }
 }

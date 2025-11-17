@@ -133,6 +133,16 @@
                     
                     @if($order->status !== 'delivered' && $order->status !== 'cancelled')
                     <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" 
+                          onsubmit="return confirm('Bạn có chắc muốn đánh dấu đơn hàng này đã giao?')">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="delivered">
+                        <button type="submit" class="btn btn-success w-100 mb-2">
+                            <i class="fas fa-check-circle"></i> Xác nhận đã giao
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{{ route('admin.orders.update-status', $order) }}" 
                           onsubmit="return confirm('Bạn có chắc muốn hủy đơn hàng này?')">
                         @csrf
                         @method('PATCH')
