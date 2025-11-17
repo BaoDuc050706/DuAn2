@@ -79,8 +79,65 @@
         </div>
 
         @if($products->hasPages())
-        <div class="d-flex justify-content-center mt-4">
+        <div id="admin-products-pagination" class="d-flex justify-content-center mt-4">
+            <style>
+                /* Scoped pagination styles to display compact numeric pager */
+                #admin-products-pagination .pagination {
+                    margin: 0;
+                    display: inline-flex;
+                    gap: 0.25rem;
+                }
+
+                #admin-products-pagination .page-item .page-link {
+                    font-size: 0.95rem !important;
+                    padding: 0.35rem 0.6rem !important;
+                    min-width: 40px;
+                    height: 40px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                /* Current page box styling */
+                #admin-products-pagination .page-item.active .page-link {
+                    background-color: #fff !important;
+                    border-color: #007bff !important;
+                    color: #007bff !important;
+                }
+
+                /* Make chevrons/text not overflow */
+                #admin-products-pagination .page-link {
+                    white-space: nowrap;
+                }
+
+                /* Hide any duplicate navs outside this container (defensive) */
+                nav[role="navigation"]:not(#admin-products-pagination nav[role="navigation"]) {
+                    display: none !important;
+                }
+            </style>
+
             {{ $products->links() }}
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const container = document.getElementById('admin-products-pagination');
+                    if (!container) return;
+
+                    // Replace rel=prev/next anchors' inner text with chevrons
+                    container.querySelectorAll('a[rel]').forEach(function(a) {
+                        const rel = a.getAttribute('rel');
+                        if (rel === 'prev') a.innerHTML = '&lsaquo;';
+                        if (rel === 'next') a.innerHTML = '&rsaquo;';
+                    });
+
+                    // Replace disabled span text labels like "Previous"/"Next" if present
+                    container.querySelectorAll('span[aria-label]').forEach(function(s) {
+                        const label = (s.getAttribute('aria-label') || '').toLowerCase();
+                        if (label.includes('previous')) s.textContent = '‹';
+                        if (label.includes('next')) s.textContent = '›';
+                    });
+                });
+            </script>
         </div>
         @endif
     </div>
