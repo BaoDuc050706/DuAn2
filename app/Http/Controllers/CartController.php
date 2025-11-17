@@ -28,27 +28,27 @@ class CartController extends Controller
         $slug = $request->input('slug', '');
         $name = (string) $request->input('name', '');
         $price = (int) $request->input('price', 0);
-        
+
         // Lấy các variant nếu có
         $variantRam = $request->input('variant_ram', '');
         $variantSsd = $request->input('variant_ssd', '');
         $variantColor = $request->input('variant_color', '');
         $variantSwitch = $request->input('variant_switch', '');
-        
+
         $cart = $request->session()->get('cart', []);
 
         // ✅ Tạo key unique từ product_id + variants
         $variantKey = $productId . '|' . $variantRam . '|' . $variantSsd . '|' . $variantColor . '|' . $variantSwitch;
 
         // ✅ Kiểm tra theo product_id + variants
-        $existingIndex = collect($cart)->search(function($item) use ($productId, $name, $price, $variantKey) {
+        $existingIndex = collect($cart)->search(function ($item) use ($productId, $name, $price, $variantKey) {
             if ($productId > 0 && isset($item['product_id']) && (int)$item['product_id'] > 0) {
                 // Kiểm tra product_id và variants
-                $itemVariantKey = (isset($item['product_id']) ? $item['product_id'] : 0) . '|' . 
-                                  (isset($item['variant_ram']) ? $item['variant_ram'] : '') . '|' . 
-                                  (isset($item['variant_ssd']) ? $item['variant_ssd'] : '') . '|' . 
-                                  (isset($item['variant_color']) ? $item['variant_color'] : '') . '|' . 
-                                  (isset($item['variant_switch']) ? $item['variant_switch'] : '');
+                $itemVariantKey = (isset($item['product_id']) ? $item['product_id'] : 0) . '|' .
+                    (isset($item['variant_ram']) ? $item['variant_ram'] : '') . '|' .
+                    (isset($item['variant_ssd']) ? $item['variant_ssd'] : '') . '|' .
+                    (isset($item['variant_color']) ? $item['variant_color'] : '') . '|' .
+                    (isset($item['variant_switch']) ? $item['variant_switch'] : '');
                 return $itemVariantKey === $variantKey;
             }
             // Fallback: kiểm tra theo name và price
@@ -60,14 +60,54 @@ class CartController extends Controller
 
         if ($existingIndex !== false) {
             // ✅ Nếu đã có -> tăng số lượng
-            $cart[$existingIndex]['qty'] += (int) $request->input('qty', 1);
+            $addQty = (int) $request->input('qty', 1);
+            $desiredQty = $cart[$existingIndex]['qty'] + $addQty;
+
+            // If product_id available, enforce stock limits
+            if ($productId > 0) {
+                $prod = \App\Models\Product::find($productId);
+                if ($prod) {
+                    $available = (int) $prod->stock;
+                    if ($desiredQty > $available) {
+                        // If strict mode requested, return error
+                        if ($request->boolean('strict_stock')) {
+                            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
+                        }
+
+                        // Otherwise cap to available and notify
+                        $cart[$existingIndex]['qty'] = $available;
+                        $request->session()->put('cart', array_values($cart));
+                        return redirect()->route('cart.index')->with('warning', 'Số lượng sản phẩm đã được điều chỉnh về tồn kho hiện có: ' . $available);
+                    }
+                }
+            }
+
+            $cart[$existingIndex]['qty'] = $desiredQty;
         } else {
             // ✅ Nếu chưa có -> thêm mới
+            $initialQty = (int) $request->input('qty', 1);
+            // If product_id present, enforce stock limits when adding
+            if ($productId > 0) {
+                $prod = \App\Models\Product::find($productId);
+                if ($prod) {
+                    $available = (int) $prod->stock;
+                    if ($initialQty > $available) {
+                        if ($request->boolean('strict_stock')) {
+                            return redirect()->back()->with('error', 'Số lượng vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
+                        }
+                        // cap to available
+                        $initialQty = $available;
+                        // notify user
+                        $request->session()->flash('warning', 'Số lượng sản phẩm đã được điều chỉnh về tồn kho hiện có: ' . $available);
+                    }
+                }
+            }
+
             $cart[] = [
                 'product_id' => $productId,
                 'name'       => $name,
                 'price'      => $price,
-                'qty'        => (int) $request->input('qty', 1),
+                'qty'        => $initialQty,
                 'slug'       => $slug,
                 'variant_ram' => $variantRam,
                 'variant_ssd' => $variantSsd,
@@ -92,7 +132,7 @@ class CartController extends Controller
         }
 
         return redirect()->route('cart.index')
-                         ->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+            ->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
     }
 
     /**
@@ -102,7 +142,22 @@ class CartController extends Controller
     {
         $cart = $request->session()->get('cart', []);
         if (isset($cart[$index])) {
-            $cart[$index]['qty']++;
+            $productId = isset($cart[$index]['product_id']) ? (int)$cart[$index]['product_id'] : 0;
+            $newQty = $cart[$index]['qty'] + 1;
+            if ($productId > 0) {
+                $prod = \App\Models\Product::find($productId);
+                if ($prod) {
+                    $available = (int)$prod->stock;
+                    if ($newQty > $available) {
+                        // cap and flash
+                        $cart[$index]['qty'] = $available;
+                        $request->session()->put('cart', $cart);
+                        return redirect()->route('cart.index')->with('warning', 'Không thể tăng. Chỉ còn ' . $available . ' sản phẩm trong kho.');
+                    }
+                }
+            }
+
+            $cart[$index]['qty'] = $newQty;
             $request->session()->put('cart', $cart);
         }
         return redirect()->route('cart.index');
@@ -135,7 +190,7 @@ class CartController extends Controller
         }
 
         return redirect()->route('cart.index')
-                         ->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+            ->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
     /**
@@ -145,6 +200,6 @@ class CartController extends Controller
     {
         $request->session()->forget('cart');
         return redirect()->route('cart.index')
-                         ->with('success', 'Đã xóa toàn bộ giỏ hàng!');
+            ->with('success', 'Đã xóa toàn bộ giỏ hàng!');
     }
 }

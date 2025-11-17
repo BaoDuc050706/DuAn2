@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Mail as OrderMail;
+use App\Models\Product;
 
 class PaymentController extends Controller
 {
@@ -19,39 +20,39 @@ class PaymentController extends Controller
 			$qty = (int) $request->query('qty', 1);
 			$productId = (int) $request->query('product_id', 0);
 			$slug = (string) $request->query('slug', '');
-			
+
 			// Lấy variants nếu có
 			$variantRam = (string) $request->query('variant_ram', '');
 			$variantSsd = (string) $request->query('variant_ssd', '');
 			$variantColor = (string) $request->query('variant_color', '');
 			$variantSwitch = (string) $request->query('variant_switch', '');
-			
+
 			if ($qty < 1) {
 				$qty = 1;
 			}
 			if ($qty > 20) {
 				$qty = 20;
 			}
-			
+
 			// ✅ Lấy giỏ hàng hiện tại thay vì reset
 			$cart = $request->session()->get('cart', []);
-			
+
 			// ✅ Tạo key unique từ product_id + variants
 			$variantKey = $productId . '|' . $variantRam . '|' . $variantSsd . '|' . $variantColor . '|' . $variantSwitch;
-			
+
 			// ✅ Kiểm tra sản phẩm đã có chưa với cùng variants
-			$existingIndex = collect($cart)->search(function($item) use ($productId, $variantKey) {
+			$existingIndex = collect($cart)->search(function ($item) use ($productId, $variantKey) {
 				if ($productId > 0 && isset($item['product_id']) && (int)$item['product_id'] > 0) {
-					$itemVariantKey = (isset($item['product_id']) ? $item['product_id'] : 0) . '|' . 
-									  (isset($item['variant_ram']) ? $item['variant_ram'] : '') . '|' . 
-									  (isset($item['variant_ssd']) ? $item['variant_ssd'] : '') . '|' . 
-									  (isset($item['variant_color']) ? $item['variant_color'] : '') . '|' . 
-									  (isset($item['variant_switch']) ? $item['variant_switch'] : '');
+					$itemVariantKey = (isset($item['product_id']) ? $item['product_id'] : 0) . '|' .
+						(isset($item['variant_ram']) ? $item['variant_ram'] : '') . '|' .
+						(isset($item['variant_ssd']) ? $item['variant_ssd'] : '') . '|' .
+						(isset($item['variant_color']) ? $item['variant_color'] : '') . '|' .
+						(isset($item['variant_switch']) ? $item['variant_switch'] : '');
 					return $itemVariantKey === $variantKey;
 				}
 				return false;
 			});
-			
+
 			if ($existingIndex !== false) {
 				// ✅ Nếu đã có -> tăng số lượng
 				$cart[$existingIndex]['qty'] += $qty;
@@ -62,8 +63,8 @@ class PaymentController extends Controller
 				// ✅ Nếu chưa có -> thêm mới với đầy đủ variant info
 				$cart[] = [
 					'product_id' => $productId,
-					'name' => $name, 
-					'qty' => $qty, 
+					'name' => $name,
+					'qty' => $qty,
 					'price' => $price,
 					'slug' => $slug,
 					'variant_ram' => $variantRam,
@@ -72,7 +73,7 @@ class PaymentController extends Controller
 					'variant_switch' => $variantSwitch,
 				];
 			}
-			
+
 			$cartItems = array_values($cart);
 			// persist to session cart
 			$request->session()->put('cart', $cartItems);
@@ -80,6 +81,27 @@ class PaymentController extends Controller
 			$cartItems = $request->session()->get('cart', []);
 			if (empty($cartItems)) {
 				return redirect()->route('cart.index')->with('error', 'Giỏ hàng trống, không thể thanh toán.');
+			}
+
+			// Ensure cart quantities do not exceed stock. Default: cap to available and notify.
+			foreach ($cartItems as $idx => $item) {
+				$pid = isset($item['product_id']) ? (int) $item['product_id'] : 0;
+				$qty = isset($item['qty']) ? (int) $item['qty'] : 1;
+				if ($pid > 0) {
+					$prod = Product::find($pid);
+					if ($prod) {
+						$available = (int) $prod->stock;
+						if ($qty > $available) {
+							if ($request->boolean('strict_stock')) {
+								return redirect()->route('cart.index')->with('error', 'Số lượng sản phẩm "' . ($item['name'] ?? '') . '" vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
+							}
+							// cap to available
+							$cartItems[$idx]['qty'] = $available;
+							$request->session()->put('cart', $cartItems);
+							$request->session()->flash('warning', 'Số lượng một số sản phẩm đã được điều chỉnh về tồn kho hiện có.');
+						}
+					}
+				}
 			}
 			foreach ($cartItems as &$item) {
 				$quantity = (int) ($item['qty'] ?? 1);
@@ -122,6 +144,26 @@ class PaymentController extends Controller
 
 		// Lấy thông tin giỏ hàng
 		$cartItems = $request->session()->get('cart', []);
+
+		// Ensure cart quantities do not exceed stock before creating order
+		foreach ($cartItems as $idx => $item) {
+			$pid = isset($item['product_id']) ? (int) $item['product_id'] : 0;
+			$qty = isset($item['qty']) ? (int) $item['qty'] : 1;
+			if ($pid > 0) {
+				$prod = Product::find($pid);
+				if ($prod) {
+					$available = (int) $prod->stock;
+					if ($qty > $available) {
+						if ($request->boolean('strict_stock')) {
+							return redirect()->route('cart.index')->with('error', 'Số lượng sản phẩm "' . ($item['name'] ?? '') . '" vượt quá tồn kho. Còn ' . $available . ' sản phẩm.');
+						}
+						$cartItems[$idx]['qty'] = $available;
+						$request->session()->put('cart', $cartItems);
+						$request->session()->flash('warning', 'Một số sản phẩm đã được điều chỉnh về tồn kho hiện có.');
+					}
+				}
+			}
+		}
 
 		// Tính toán tổng tiền
 		$subtotal = collect($cartItems)->reduce(function ($carry, $item) {

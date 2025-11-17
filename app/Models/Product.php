@@ -17,8 +17,12 @@ class Product extends Model
         'image',
         'category_id',
         'discount',
+        'stock',
     ];
 
+    protected $casts = [
+        'stock' => 'integer',
+    ];
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -29,4 +33,3 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 }
-    

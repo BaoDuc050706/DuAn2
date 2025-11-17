@@ -27,6 +27,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_id' => 'nullable|exists:categories,id',
@@ -34,6 +35,12 @@ class ProductController extends Controller
         ]);
 
         $data = $request->all();
+        // Ensure stock is integer (default 0 if omitted)
+        if ($request->filled('stock')) {
+            $data['stock'] = (int) $request->input('stock');
+        } else {
+            $data['stock'] = 0;
+        }
 
         // Tạo slug từ tên sản phẩm
         $data['slug'] = Str::slug($request->name);
@@ -63,6 +70,7 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_id' => 'nullable|exists:categories,id',
@@ -70,6 +78,10 @@ class ProductController extends Controller
         ]);
 
         $data = $request->all();
+        // Ensure stock is integer when updating
+        if ($request->filled('stock')) {
+            $data['stock'] = (int) $request->input('stock');
+        }
 
         // Cập nhật slug nếu tên thay đổi
         if ($request->name !== $product->name) {
