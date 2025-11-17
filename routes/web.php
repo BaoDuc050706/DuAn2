@@ -58,13 +58,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Cart
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.remove');
-Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
-Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+// Cart (require login)
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
+    Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
@@ -81,5 +83,3 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::resource('/products', AdminProductController::class)->except(['show']);
 });
-
-
