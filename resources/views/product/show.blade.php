@@ -415,34 +415,32 @@
 
 @section('scripts')
 <script>
-    // Function để hiển thị toast thông báo
+    // Function để hiển thị toast thông báo (cập nhật tiêu đề theo loại và tự ẩn)
     function showToast(message, type = 'success') {
         const toastElement = document.getElementById('successToast');
-        const toastMessage = document.getElementById('toastMessage');
-        
-        // Cập nhật message
-        toastMessage.textContent = message;
-        
-        // Cập nhật style theo type
-        const toastHeader = toastElement.querySelector('.toast-header');
         const toastBody = toastElement.querySelector('.toast-body');
-        
+        const toastHeader = toastElement.querySelector('.toast-header');
+        const titleEl = toastHeader.querySelector('strong.me-auto');
+
+        // Reset header classes
+        toastHeader.classList.remove('bg-success', 'bg-danger', 'bg-warning');
+
         if (type === 'error') {
-            toastHeader.classList.remove('bg-success');
             toastHeader.classList.add('bg-danger');
-            toastBody.innerHTML = '<i class="bi bi-exclamation-circle text-danger me-2"></i><span id="toastMessage">' + message + '</span>';
+            titleEl.textContent = 'Lỗi';
+            toastBody.innerHTML = '<i class="bi bi-exclamation-circle text-danger me-2" style="font-size:1.3rem"></i><span>' + message + '</span>';
         } else if (type === 'warning') {
-            toastHeader.classList.remove('bg-success');
             toastHeader.classList.add('bg-warning');
-            toastBody.innerHTML = '<i class="bi bi-exclamation-triangle text-warning me-2"></i><span id="toastMessage">' + message + '</span>';
+            titleEl.textContent = 'Chú ý';
+            toastBody.innerHTML = '<i class="bi bi-exclamation-triangle text-warning me-2" style="font-size:1.3rem"></i><span>' + message + '</span>';
         } else {
-            toastHeader.classList.remove('bg-danger', 'bg-warning');
             toastHeader.classList.add('bg-success');
-            toastBody.innerHTML = '<i class="bi bi-bag-check text-success me-2"></i><span id="toastMessage">' + message + '</span>';
+            titleEl.textContent = 'Thành công';
+            toastBody.innerHTML = '<i class="bi bi-bag-check text-success me-2" style="font-size:1.3rem"></i><span>' + message + '</span>';
         }
-        
-        // Show toast
-        const toast = new bootstrap.Toast(toastElement);
+
+        // Show toast with autohide (4s)
+        const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
         toast.show();
     }
 
@@ -521,10 +519,36 @@
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                }
+                    'Accept': 'application/json'
+                },
+                // Ensure cookies/session are sent so Laravel can authenticate
+                credentials: 'same-origin'
             })
-            .then(response => response.json())
+            .then(async response => {
+                // Nếu server trả 401 (Unauthenticated) -> yêu cầu login
+                if (response.status === 401) {
+                    showToast('Bạn cần đăng nhập để thêm sản phẩm vào giỏ. Chuyển tới trang đăng nhập...', 'warning');
+                    setTimeout(() => {
+                        window.location.href = "{{ route('login') }}";
+                    }, 1400);
+                    return null;
+                }
+
+                // Cố gắng parse JSON (nhiều trường hợp sẽ là JSON)
+                let data = null;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    // Không phải JSON -> hiển thị lỗi chung
+                    console.error('Invalid JSON response', e);
+                    showToast('Có lỗi xảy ra (phản hồi không hợp lệ).', 'error');
+                    return null;
+                }
+
+                return data;
+            })
             .then(data => {
+                if (!data) return;
                 if (data.success) {
                     showToast('Sản phẩm đã được thêm vào giỏ hàng thành công!', 'success');
                     // Quay về trang chủ sau 2 giây

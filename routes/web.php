@@ -58,15 +58,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Cart (require login)
-Route::middleware('auth')->group(function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
-    Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
-    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-    Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
-});
+// Cart routes: allow guests to add/manage cart via session; checkout still requires auth
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::delete('/cart/{index}', [CartController::class, 'remove'])->name('cart.remove');
+Route::patch('/cart/{index}/inc', [CartController::class, 'increment'])->name('cart.inc');
+Route::patch('/cart/{index}/dec', [CartController::class, 'decrement'])->name('cart.dec');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 // Search
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
