@@ -63,30 +63,34 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2 flex-wrap ms-md-auto">
-                            <form method="post" action="{{ route('cart.dec', $index) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button class="btn btn-sm btn-outline-secondary">-</button>
-                            </form>
+                        <div class="cart-item-actions d-flex align-items-center ms-md-auto">
+                            <div class="cart-qty-control d-inline-flex align-items-center">
+                                <form method="post" action="{{ route('cart.dec', $index) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button class="btn btn-sm btn-outline-secondary">-</button>
+                                </form>
 
-                            <span class="px-2">{{ $item['qty'] }}</span>
+                                <span class="px-3 fw-semibold">{{ $item['qty'] }}</span>
 
-                            <form method="post" action="{{ route('cart.inc', $index) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button class="btn btn-sm btn-outline-secondary">+</button>
-                            </form>
-
-                            <div class="fw-bold ms-3">
-                                {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}₫
+                                <form method="post" action="{{ route('cart.inc', $index) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button class="btn btn-sm btn-outline-secondary">+</button>
+                                </form>
                             </div>
 
-                            <form method="post" action="{{ route('cart.remove', $index) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger ms-2">Xóa</button>
-                            </form>
+                            <div class="cart-price-remove d-inline-flex align-items-center">
+                                <div class="fw-bold mb-0 text-nowrap">
+                                    {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}₫
+                                </div>
+
+                                <form method="post" action="{{ route('cart.remove', $index) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @endforeach

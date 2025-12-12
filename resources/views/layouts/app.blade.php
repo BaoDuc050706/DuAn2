@@ -116,6 +116,33 @@
             font-weight: 700;
         }
 
+        /* Cart page alignment */
+        .cart-item-actions {
+            gap: 1.25rem;
+            flex-wrap: nowrap;
+        }
+
+        .cart-item-actions .cart-qty-control,
+        .cart-item-actions .cart-price-remove {
+            gap: 0.75rem;
+            flex-wrap: nowrap;
+        }
+
+        .cart-item-actions .cart-price-remove {
+            margin-left: 1rem;
+        }
+
+        @media (max-width: 576px) {
+            .cart-item-actions {
+                flex-wrap: wrap;
+                gap: 0.75rem;
+            }
+
+            .cart-item-actions .cart-price-remove {
+                margin-left: 0;
+            }
+        }
+
         .section-title {
             font-weight: 700;
         }
