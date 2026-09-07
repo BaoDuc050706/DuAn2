@@ -1,0 +1,118 @@
+/* Custom UI polish for Gear store - overrides and improvements */
+:root{
+  --brand:#ff5a00;
+  --brand-600:#ff4c00;
+  --muted:#6c757d;
+  --card-bg:#ffffff;
+  --surface:#f8f9fa;
+}
+
+body{
+  font-family: 'Roboto', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #222;
+  background: linear-gradient(180deg, var(--surface) 0%, #fbfbfb 100%);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Header polish */
+header.topbar, header .topbar .container{
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+}
+
+header{
+  box-shadow: 0 6px 18px rgba(15,15,15,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1100;
+  backdrop-filter: blur(4px);
+}
+
+.navbar-brand{
+  color: #111 !important;
+}
+
+.navbar-brand .brand-icon{font-size:1.8rem}
+.navbar-brand .brand-text{font-weight:800;letter-spacing:0.6px;color:#111}
+
+/* Category button and search */
+.category-btn{
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.06);
+  color: #111;
+  padding: .45rem .8rem;
+  border-radius: 12px;
+}
+
+.search-wrap .form-control{
+  border-radius: 28px 0 0 28px !important;
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.search-wrap .btn{
+  border-radius: 0 28px 28px 0 !important;
+  background: var(--brand-600);
+  border: none;
+}
+
+/* Buttons */
+.btn-primary, .btn:not(.btn-link){
+  background: linear-gradient(90deg, var(--brand) 0%, var(--brand-600) 100%);
+  border: none;
+  color: #fff !important;
+  box-shadow: 0 6px 20px rgba(255,90,0,0.12);
+}
+
+.btn-outline-secondary{
+  border-radius: 10px;
+}
+
+/* Product card improvements */
+.product-card{
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid rgba(18,18,18,0.04);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.product-card:hover{transform: translateY(-6px);box-shadow:0 18px 40px rgba(20,20,20,0.06)}
+.product-card img{display:block;width:100%;height:200px;object-fit:cover}
+.product-card .card-body{padding:1rem}
+.product-card .price{color:var(--brand-600);font-weight:800}
+
+/* Grid for product lists */
+.product-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+@media (max-width:1200px){.product-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:768px){.product-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.product-grid{grid-template-columns:repeat(1,1fr)}}
+
+/* Footer */
+footer{background:#0f1720;color:#cbd5e1;padding:48px 0}
+footer h5, footer h6{color:#fff}
+footer a{color:#cbd5e1}
+
+/* Toast style */
+.toast-fixed{min-width:260px;border-radius:10px}
+
+/* Theme switch touch-up */
+.theme-switch .switch-track{background:linear-gradient(90deg,#eee,#fff)}
+.theme-switch.dark-mode .switch-track{background:linear-gradient(90deg,#333,#444)}
+
+/* Small helpers */
+.container{max-width:1180px}
+.section-title{font-size:1.15rem;color:#111}
+
+/* Accessibility: increase focus styles */
+a:focus, button:focus, input:focus{outline:3px solid rgba(255,90,0,0.15);outline-offset:3px}
+
+/* Minor responsive tweaks for header */
+@media (max-width:768px){
+  .navbar-brand .brand-text{font-size:1.25rem}
+  .search-wrap{margin-top:0.5rem}
+}
+
+/* Polished badges */
+.badge{border-radius:999px;padding:.35rem .6rem;font-weight:700}
+
+/* Improve cart badge appearance */
+#cartQtyBadge{transform:translate(.4rem,-.6rem);font-size:.75rem}

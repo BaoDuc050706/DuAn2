@@ -1,0 +1,118 @@
+@extends('layouts.app')
+
+@section('title', 'Giỏ hàng')
+
+@section('content')
+<div class="container my-4">
+    <h1 class="h4 mb-3">Giỏ hàng</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            {{-- Nếu giỏ hàng trống --}}
+            @if (empty($cartItems))
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-cart-x display-6 d-block mb-2"></i>
+                    Giỏ hàng của bạn đang trống.
+                    <div class="mt-3">
+                        <a href="{{ route('home') }}" class="btn btn-dark">Tiếp tục mua sắm</a>
+                    </div>
+                </div>
+            @else
+                {{-- Danh sách sản phẩm --}}
+                @foreach($cartItems as $index => $item)
+                    @php
+                        $imageRaw = $item['image'] ?? '';
+                        $imageUrl = null;
+
+                        if ($imageRaw && \Illuminate\Support\Str::startsWith($imageRaw, ['http://', 'https://'])) {
+                            $imageUrl = $imageRaw;
+                        } elseif ($imageRaw && \Illuminate\Support\Str::startsWith($imageRaw, ['/'])) {
+                            $imageUrl = asset(ltrim($imageRaw, '/'));
+                        } elseif (!empty($imageRaw)) {
+                            $imageUrl = asset('image/' . rawurlencode($imageRaw));
+                        }
+                    @endphp
+                    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-start align-items-md-center py-3 border-bottom">
+                        <div class="d-flex gap-3 align-items-center w-100">
+                            <div class="flex-shrink-0">
+                                <img src="{{ $imageUrl ?: 'https://via.placeholder.com/80x80?text=No+Image' }}"
+                                    alt="{{ $item['name'] }}"
+                                    class="rounded shadow-sm"
+                                    style="width: 80px; height: 80px; object-fit: cover;">
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{{ $item['name'] }}</div>
+                                <div class="small text-muted">{{ number_format($item['price'], 0, ',', '.') }}₫ / sp</div>
+                                
+                                {{-- Hiển thị các variant nếu có --}}
+                                @if(!empty($item['variant_ram']) || !empty($item['variant_ssd']) || !empty($item['variant_color']) || !empty($item['variant_switch']))
+                                    <div class="small text-secondary mt-1">
+                                        @if(!empty($item['variant_ram']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ram']) }}</span>
+                                        @endif
+                                        @if(!empty($item['variant_ssd']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst($item['variant_ssd']) }}</span>
+                                        @endif
+                                        @if(!empty($item['variant_color']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_color'])) }}</span>
+                                        @endif
+                                        @if(!empty($item['variant_switch']))
+                                            <span class="badge bg-light text-dark">{{ ucfirst(str_replace('_', ' ', $item['variant_switch'])) }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="cart-item-actions d-flex align-items-center ms-md-auto">
+                            <div class="cart-qty-control d-inline-flex align-items-center">
+                                <form method="post" action="{{ route('cart.dec', $index) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button class="btn btn-sm btn-outline-secondary">-</button>
+                                </form>
+
+                                <span class="px-3 fw-semibold">{{ $item['qty'] }}</span>
+
+                                <form method="post" action="{{ route('cart.inc', $index) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button class="btn btn-sm btn-outline-secondary">+</button>
+                                </form>
+                            </div>
+
+                            <div class="cart-price-remove d-inline-flex align-items-center">
+                                <div class="fw-bold mb-0 text-nowrap">
+                                    {{ number_format($item['price'] * $item['qty'], 0, ',', '.') }}₫
+                                </div>
+
+                                <form method="post" action="{{ route('cart.remove', $index) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-outline-danger">Xóa</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+
+                {{-- Tổng cộng --}}
+                <div class="mt-4 border-top pt-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="fw-bold fs-5">Tổng cộng:</div>
+                        <div class="h5 mb-0 text-danger">{{ number_format($total, 0, ',', '.') }}₫</div>
+                    </div>
+                </div>
+
+                {{-- Nút hành động --}}
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{{ route('checkout.index') }}" class="btn btn-danger">Thanh toán</a>
+                    <form method="post" action="{{ route('cart.clear') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-secondary">Xóa giỏ hàng</button>
+                    </form>
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+@endsection
