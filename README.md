@@ -1,7 +1,7 @@
-# GearZone
+# GearZone (CAEKT Gear Store)
 
-> **VI** — Nền tảng web GearZone xây dựng bằng Laravel, định hướng giới thiệu và kinh doanh thiết bị công nghệ.
-> **EN** — A Laravel web application for showcasing and selling technology equipment.
+> **VI** — Website thương mại điện tử Laravel 12 bán laptop gaming, PC gear và phụ kiện (tai nghe, chuột, bàn phím, màn hình, loa). Có catalogue, giỏ hàng, đặt hàng, quản trị, chatbot tư vấn và dữ liệu mẫu.
+> **EN** — A Laravel 12 e-commerce store for gaming laptops and PC peripherals, with catalogue, cart, checkout, admin, a support chatbot, and seed data.
 
 [Tiếng Việt](#tiếng-việt) · [English](#english)
 
@@ -11,51 +11,128 @@
 
 ### Tổng quan
 
-GearZone là nền tảng khởi đầu cho website về PC gaming, laptop và phụ kiện. Dự án tách phần hiển thị Blade khỏi định tuyến, quản lý schema bằng migration và dùng Vite cho asset front-end. Cấu trúc này sẵn sàng mở rộng catalogue, giỏ hàng, đơn hàng và quản trị mà không làm thay đổi nền tảng.
+GearZone (giao diện chatbot gọi **CAEKT Gear Store**) là website bán laptop gaming và phụ kiện. Tầng hiển thị Blade tách khỏi routing; schema nằm trong migration; dữ liệu mẫu nằm trong seeder; Vite build CSS/JS. Apache chỉ trỏ vào `public/`.
 
-### Phạm vi hiện tại
+### Tính năng đã có
 
-- Trang GearZone tại `/home`, dùng layout header, content và footer chung.
-- Laravel routing và Blade inheritance: `layouts.app` → `home`.
-- Migration hạ tầng cho `users`, `sessions`, `cache`, `jobs`, `job_batches` và `failed_jobs`.
-- Vite + Tailwind CSS đã được cấu hình; Bootstrap 5, Bootstrap Icons và Google Fonts đang được nạp qua CDN trong layout.
+**Khách / thành viên**
 
-> Các liên kết Sản phẩm, Tin tức, Liên hệ, tìm kiếm và nghiệp vụ thương mại điện tử hiện mới là định hướng giao diện. Route, model, controller và logic tương ứng chưa được triển khai.
+- Trang chủ `/home`: sản phẩm mới, lọc theo danh mục, danh mục nổi bật (không hiện Laptop/Loa ở block nổi bật; menu vẫn có đủ danh mục).
+- Chi tiết sản phẩm `/product/{slug}` (ảnh chính từ `product_images` hoặc `products.image`).
+- Trang danh mục `/category/{slug}`.
+- Tìm kiếm `/search?q=` theo tên và mô tả.
+- Đăng ký / đăng nhập / đăng xuất; hồ sơ (tên, email, SĐT, địa chỉ).
+- Giỏ hàng session: thêm, tăng/giảm, xóa, xóa hết; tối đa 20 món/dòng; biến thể (RAM, SSD, màu, switch) khi có trên form.
+- Đăng nhập: gộp giỏ session với `users.cart_json`.
+- Checkout (cần đăng nhập): COD, chuyển khoản, thẻ (mô phỏng); phí ship 60.000đ, miễn phí nếu đơn ≥ 2.000.000đ; kiểm tra tồn kho; QR demo; lưu `orders`; gửi mail xác nhận (mặc định `MAIL_MAILER=log`).
+- Lịch sử đơn `/orders` và tra cứu `/orders/lookup` — **theo session** sau khi đặt (admin xem đơn trên MySQL).
+- Chatbot widget: `POST /chatbot/ask` (throttle 20/phút). Có `OPENAI_API_KEY` thì GPT; không có thì trả lời theo intent (danh mục, bán chạy, giá rẻ, ship, bảo hành, đặt hàng).
+
+**Quản trị** (`auth` + middleware `admin`, prefix `/admin`)
+
+- Dashboard: doanh thu đơn `delivered`, số đơn/user/sản phẩm, doanh thu 6 tháng, đơn gần đây, thống kê trạng thái.
+- CRUD sản phẩm (upload ảnh `public/image`, slug, danh mục, giá, tồn, giảm giá).
+- Danh sách / chi tiết đơn, lọc trạng thái, tìm mã/tên/email.
+- Đổi trạng thái: `pending` → `processing` → `shipped` → `delivered` / `cancelled`. Khi chuyển sang **delivered** lần đầu: trừ `products.stock`.
+
+**Chưa gắn route (có file, chưa dùng trên web)**
+
+- `CheckoutController` — checkout thật đi `PaymentController`.
+- `OrderTrackingController` — tra cứu DB (`order_code`); schema hiện dùng `order_number`. Tra cứu khách đang là `OrderController::lookup`.
 
 ### Công nghệ
 
 | Lớp | Công nghệ | Vai trò |
 | --- | --- | --- |
-| Back end | PHP 8.2+, Laravel 12 | HTTP lifecycle, routing, Blade, ORM và migration |
-| Database | MySQL / MariaDB | Dữ liệu ứng dụng qua XAMPP |
-| Front end | Blade, JavaScript, CSS | Giao diện render phía server |
-| Asset | Vite 7, Tailwind CSS 4 | Build và theo dõi asset |
-| UI | Bootstrap 5, Bootstrap Icons, Google Fonts | Thành phần giao diện hiện có |
-| Local stack | XAMPP: Apache + MySQL | Web server và database cục bộ |
-| Test | PHPUnit 11 | Kiểm thử Laravel |
+| Back end | PHP 8.2+, Laravel 12 | HTTP, routing, Blade, Eloquent, mail, middleware |
+| Database | MySQL / MariaDB | Catalogue, user, đơn, session/cache/queue |
+| Front end | Blade, JS, CSS | SSR + chatbot fetch JSON |
+| Asset | Vite 7, Tailwind CSS 4 | Build / HMR |
+| UI | Bootstrap 5, Bootstrap Icons, Google Fonts | Layout CDN |
+| Tích hợp | `openai-php/client`, `simplesoftwareio/simple-qrcode` | Chat GPT (tùy chọn), QR demo |
+| Local | XAMPP (Apache + MySQL) hoặc `php artisan serve` | Chạy local |
+| Test | PHPUnit 11 | `php artisan test` (skeleton mặc định) |
 
-### Kiến trúc & logic
+### Kiến trúc
 
 ```text
-Browser → Apache/XAMPP → public/index.php → Laravel middleware/router
-        → routes/web.php → Blade view → layouts/app.blade.php → HTML response
+Browser → Apache/XAMPP hoặc artisan serve → public/index.php
+       → middleware (web, auth, admin) → routes/web.php
+       → Controller → Eloquent / session → Blade
 
-.env (DB_*) → config/database.php → Eloquent / migrations → MySQL
-resources/css + resources/js → Vite → public/build
+Chatbot: POST /chatbot/ask → ChatBotController → ChatBotService
+         → OpenAI (nếu có key) hoặc trả lời theo từ khóa + Product query
+
+Checkout: Cart session → PaymentController → orders (MySQL)
+         → Mail::to(email) → xóa cart
 ```
 
-- `public/` là **web root duy nhất** của Apache; không trỏ đến thư mục gốc vì có thể lộ `.env` và mã nguồn.
-- `routes/web.php` là entry point giao diện; route `/home` trả về `home.blade.php`.
-- Layout chung chứa khung trang; view con đưa nội dung vào `@yield('content')`.
-- Migration là nguồn chân lý cho database: mọi thay đổi schema dùng migration, không sửa thủ công nếu cần chia sẻ giữa máy.
-- Cấu hình mặc định dùng database cho session, cache và queue; các bảng migration đi kèm cần tồn tại khi chạy MySQL.
+- Document root Apache: **`public/`** — không trỏ thư mục gốc (lộ `.env`).
+- Role: `users.role` = `user` \| `admin`; `User::isAdmin()`; alias middleware `admin`.
+- Schema chỉ đổi bằng migration.
+
+### Database
+
+Nguồn: `database/migrations/`.
+
+**users**
+
+| Cột | Ý nghĩa |
+| --- | --- |
+| name, email, password | Auth |
+| phone, address, city, district, ward, address_line | Liên hệ / địa chỉ |
+| cart_json | Giỏ lưu DB, gộp khi login |
+| role | `user` (mặc định) / `admin` |
+
+Kèm Laravel: `password_reset_tokens`, `sessions`.
+
+**categories** — `name`, `slug` (unique), `featured`, `parent_id` (cây, seeder đang để `null`).
+
+**products** — `name`, `slug`, `category_id`, `price`, `stock`, `discount`, `connection`, `rgb`, `image`, `description`.
+
+**product_images** — `product_id` (cascade), `image_url`, `is_primary`.
+
+**orders**
+
+| Cột | Ý nghĩa |
+| --- | --- |
+| user_id | Nullable, `onDelete set null` |
+| order_number | Unique (`ORD` + timestamp + random) |
+| full_name, email, phone, address | Người nhận |
+| payment_method | `cod` \| `bank` \| `card` |
+| subtotal, shipping, total | Tiền |
+| status | `pending`, `processing`, `shipped`, `delivered`, `cancelled` |
+| items | JSON dòng giỏ |
+
+Hạ tầng: `cache`, `jobs`, `job_batches`, `failed_jobs`.
+
+Quan hệ Eloquent: `Product` belongsTo `Category`, hasMany `ProductImage`; `Order` belongsTo `User`.
+
+### Seeding
+
+`php artisan db:seed` (hoặc `migrate --seed` / `migrate:fresh --seed`):
+
+1. **DatabaseSeeder** — user `test@example.com` / mật khẩu factory **`password`**; insert danh mục rồi gọi seeder con.
+2. **CategorySeeder** — `updateOrCreate` theo slug: Tai nghe, Chuột, Bàn phím, Màn hình, Loa, Laptop.
+3. **AdminSeeder** — admin demo (đổi mật khẩu nếu repo public).
+4. **ProductSeeder** — ~13 sản phẩm (bàn phím, chuột, tai nghe, laptop ASUS/HP/Dell), giá VND, tồn, giảm giá, file ảnh trong `public/`.
+
+Tài khoản demo (local):
+
+| Vai trò | Email | Mật khẩu |
+| --- | --- | --- |
+| User | `test@example.com` | `password` |
+| Admin | `adminproject2@gmail.com` | `caekt2006` |
+
+Admin: [http://gearzone.test/admin/dashboard](http://gearzone.test/admin/dashboard) (hoặc URL `artisan serve`).
 
 ### Yêu cầu
 
-- XAMPP có **Apache** và **MySQL/MariaDB** đang chạy.
-- PHP CLI 8.2+ với `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `tokenizer`, `xml`, `ctype`, `curl`.
-- Composer 2.x, Node.js LTS, npm; Git là tùy chọn.
-- Nên dùng PHP CLI cùng phiên bản PHP của XAMPP.
+- XAMPP: Apache + MySQL **hoặc** PHP CLI + MySQL.
+- PHP 8.2+ (`pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `tokenizer`, `xml`, `ctype`, `curl`).
+- Composer 2.x, Node.js LTS, npm.
+- Chatbot GPT: `OPENAI_API_KEY` (không bắt buộc).
+- Mail thật: cấu hình SMTP; mặc định ghi log.
 
 ```powershell
 php -v
@@ -66,8 +143,8 @@ npm -v
 
 ### Cài đặt MySQL + XAMPP
 
-1. Start **Apache** và **MySQL** trong XAMPP Control Panel.
-2. Tạo database qua phpMyAdmin hoặc MySQL CLI:
+1. Bật Apache và MySQL.
+2. Tạo DB:
 
 ```sql
 CREATE DATABASE gearzone
@@ -75,7 +152,7 @@ CREATE DATABASE gearzone
   COLLATE utf8mb4_unicode_ci;
 ```
 
-3. Tại thư mục dự án:
+3. Trong thư mục dự án:
 
 ```powershell
 Copy-Item .env.example .env
@@ -83,7 +160,7 @@ composer install
 npm install
 ```
 
-4. Sửa `.env`: thay cấu hình SQLite bằng MySQL.
+4. `.env` — MySQL (không dùng SQLite nếu chạy theo stack này):
 
 ```dotenv
 APP_NAME="GearZone"
@@ -97,21 +174,28 @@ DB_PORT=3306
 DB_DATABASE=gearzone
 DB_USERNAME=root
 DB_PASSWORD=
+
+# Tùy chọn — chatbot GPT
+# OPENAI_API_KEY=
+# OPENAI_MODEL=gpt-4o-mini
 ```
 
-Đổi `DB_PORT` / `DB_PASSWORD` theo MySQL local của bạn. Không commit `.env`.
+Không commit `.env`.
 
-5. Khởi tạo ứng dụng, schema và asset:
+5. Key, schema, seed, asset:
 
 ```powershell
 php artisan key:generate
-php artisan migrate
+php artisan migrate --seed
+php artisan storage:link
 npm run build
 ```
 
-### Chạy qua Apache Virtual Host
+`storage:link` nếu sau này dùng disk `public`; ảnh admin hiện copy vào `public/image`.
 
-Đặt source tại vị trí Apache có thể đọc (ví dụ `C:\\xampp\\htdocs\\DuAn2`). Trong `C:\\xampp\\apache\\conf\\extra\\httpd-vhosts.conf`, thêm:
+### Apache Virtual Host
+
+DocumentRoot = `.../DuAn2/public`. Ví dụ `C:\xampp\apache\conf\extra\httpd-vhosts.conf`:
 
 ```apache
 <VirtualHost *:80>
@@ -125,58 +209,53 @@ npm run build
 </VirtualHost>
 ```
 
-Trong `C:\\xampp\\apache\\conf\\httpd.conf`, đảm bảo hai dòng sau đang bật (bỏ `#` nếu cần):
-
-```apache
-LoadModule rewrite_module modules/mod_rewrite.so
-Include conf/extra/httpd-vhosts.conf
-```
-
-Thêm dòng này vào `C:\\Windows\\System32\\drivers\\etc\\hosts` với quyền quản trị:
+`httpd.conf`: bật `mod_rewrite` và `Include conf/extra/httpd-vhosts.conf`. Hosts (Admin):
 
 ```text
 127.0.0.1 gearzone.test
 ```
 
-Khởi động lại Apache và mở [http://gearzone.test/home](http://gearzone.test/home). Nếu không dùng virtual host, chạy `php artisan serve` và mở URL Laravel trả về.
+Restart Apache → [http://gearzone.test/home](http://gearzone.test/home). Không dùng vhost: `php artisan serve`.
 
 ### Workflow
 
 ```text
-Migration → migrate → Model/Controller/Validation/Route → Blade UI
-→ npm run dev/build → php artisan test
+Migration → migrate --seed → Model / Controller / Validation / Route → Blade
+→ npm run dev | build → php artisan test
 ```
 
 | Mục tiêu | Lệnh |
 | --- | --- |
-| Theo dõi asset khi phát triển | `npm run dev` |
-| Build asset tối ưu | `npm run build` |
-| Tạo migration | `php artisan make:migration create_products_table` |
-| Chạy migration | `php artisan migrate` |
-| Hoàn tác batch gần nhất | `php artisan migrate:rollback` |
-| Tạo lại toàn bộ schema local | `php artisan migrate:fresh` |
+| Asset dev | `npm run dev` |
+| Build | `npm run build` |
+| Migrate | `php artisan migrate` |
+| Seed | `php artisan db:seed` |
+| Schema + seed sạch (local) | `php artisan migrate:fresh --seed` |
+| Rollback batch | `php artisan migrate:rollback` |
 | Test | `php artisan test` |
-| Dọn cache | `php artisan optimize:clear` |
+| Xóa cache | `php artisan optimize:clear` |
 
-`php artisan migrate:fresh` xóa toàn bộ bảng của database đang cấu hình, chỉ dùng cho môi trường local có thể mất dữ liệu.
+`migrate:fresh` xóa **mọi bảng** của DB đang cấu hình — chỉ dùng local.
 
-### Cấu trúc & quy ước
+### Cấu trúc
 
 ```text
-app/                    Controllers, models và logic ứng dụng
-database/migrations/    Lịch sử thay đổi schema MySQL
-public/                 Apache web root và asset đã build
-resources/views/        Blade layouts và trang giao diện
-resources/css, js/      Asset nguồn cho Vite
-routes/web.php          Route web
-config/                 Cấu hình Laravel
-tests/                  Unit và feature tests
+app/Http/Controllers/     Storefront + Admin
+app/Http/Middleware/      AdminMiddleware
+app/Models/               User, Category, Product, ProductImage, Order
+app/Services/ChatBotService.php
+app/Mail/                 Mail xác nhận đơn
+database/migrations/
+database/seeders/         Database, Category, Admin, Product
+resources/views/          layouts, home, product, cart, checkout, auth, admin, emails
+routes/web.php
+public/image/             Ảnh upload / catalogue
+tests/
 ```
 
-- Validate request trước khi ghi dữ liệu; dùng Eloquent/query builder, không nối SQL từ input.
-- Đặt nghiệp vụ trong controller/service/model, không nhồi logic vào Blade.
-- Dùng UTF-8 cho file nguồn và `utf8mb4` cho MySQL để hiển thị tiếng Việt/Unicode chính xác.
-- Chạy `php artisan test` trước khi chia sẻ thay đổi.
+- Validate trước khi ghi; Eloquent / binding, không nối SQL từ input.
+- Logic ở controller/service, không nhồi Blade.
+- UTF-8 source, MySQL `utf8mb4`.
 
 ---
 
@@ -184,79 +263,36 @@ tests/                  Unit và feature tests
 
 ### Overview
 
-GearZone is a Laravel foundation for a gaming PC, laptop, and accessories website. Blade presentation is kept separate from routing, migrations version the database schema, and Vite manages front-end assets. The structure can grow into catalogue, cart, ordering, and administration features without replacing its foundation.
+GearZone is a Laravel 12 store for gaming laptops and peripherals. Blade is separate from routing; MySQL schema is versioned with migrations; seeders load demo catalogue and an admin user. Optional OpenAI powers the store chatbot.
 
-### Current scope
+### Implemented scope
 
-- A GearZone page at `/home` built from a shared header/content/footer layout.
-- Laravel web routing and Blade inheritance: `layouts.app` → `home`.
-- Infrastructure migrations for users, sessions, cache, jobs, job batches, and failed jobs.
-- Vite + Tailwind CSS are configured; Bootstrap 5, Bootstrap Icons, and Google Fonts are loaded through the existing layout CDN.
-
-> Product, News, Contact, search, and e-commerce links are UI placeholders. Their routes, models, controllers, and business rules have not been implemented yet.
+- Home, category, product detail, search.
+- Register/login/logout, profile, session cart with variant keys; merge into `cart_json` on login.
+- Auth checkout: COD / bank / card (simulated), shipping rule, stock cap, demo QR, persist `orders`, confirmation mail.
+- Customer order list/lookup via **session**; admin orders via **MySQL**.
+- Admin dashboard, product CRUD, order status + stock decrement on first `delivered`.
+- Chatbot JSON API with GPT or keyword fallback.
+- Unused in `web.php`: `CheckoutController`, `OrderTrackingController`.
 
 ### Stack
 
-| Layer | Technology | Responsibility |
-| --- | --- | --- |
-| Back end | PHP 8.2+, Laravel 12 | HTTP lifecycle, routing, Blade, ORM, migrations |
-| Database | MySQL / MariaDB | Application data through XAMPP |
-| Front end | Blade, JavaScript, CSS | Server-rendered UI |
-| Asset tooling | Vite 7, Tailwind CSS 4 | Build and dev asset pipeline |
-| UI | Bootstrap 5, Bootstrap Icons, Google Fonts | Existing UI components |
-| Local stack | XAMPP: Apache + MySQL | Local web server and database |
-| Testing | PHPUnit 11 | Laravel testing |
+PHP 8.2+ / Laravel 12, MySQL, Blade, Vite 7, Tailwind 4, Bootstrap 5, `openai-php/client`, Simple QR Code, PHPUnit 11, XAMPP or `artisan serve`.
 
-### Architecture & execution logic
+### Database & seed
 
-```text
-Browser → Apache/XAMPP → public/index.php → Laravel middleware/router
-        → routes/web.php → Blade view → layouts/app.blade.php → HTML response
+See the Vietnamese **Database** and **Seeding** sections (same schema and demo accounts). Run `php artisan migrate --seed` after MySQL `gearzone` + `.env`.
 
-.env (DB_*) → config/database.php → Eloquent / migrations → MySQL
-resources/css + resources/js → Vite → public/build
-```
+### Setup
 
-- Apache must use `public/` as its only document root; never expose the project root.
-- `routes/web.php` is the web entry point. `/home` returns `home.blade.php`.
-- The shared layout owns the page shell; child views supply `@yield('content')`.
-- Migrations are the schema source of truth. Version every database structure change.
-- Sessions, cache, and queues are configured to use the database, so their migration tables are required with MySQL.
+1. Create `gearzone` (`utf8mb4` / `utf8mb4_unicode_ci`).
+2. Copy `.env.example` → `.env`; `composer install`; `npm install`.
+3. Set `APP_NAME`, `APP_URL`, MySQL `DB_*`. Optional `OPENAI_API_KEY`.
+4. `php artisan key:generate`, `php artisan migrate --seed`, `npm run build`.
+5. Point Apache at `public/` or use `php artisan serve`.
 
-### Requirements & setup
-
-Run Apache and MySQL/MariaDB in XAMPP. Install PHP CLI 8.2+ with standard Laravel/MySQL extensions, Composer 2.x, Node.js LTS, and npm. Using the same PHP CLI version as XAMPP is recommended.
-
-1. Create the `gearzone` database with `utf8mb4` and `utf8mb4_unicode_ci`.
-2. Copy `.env.example` to `.env`, then run `composer install` and `npm install`.
-3. Set `APP_NAME="GearZone"`, `APP_URL=http://gearzone.test`, and the `DB_*` values to the MySQL configuration shown in the Vietnamese section.
-4. Run:
-
-```powershell
-php artisan key:generate
-php artisan migrate
-npm run build
-```
-
-### Apache virtual host
-
-Set Apache `DocumentRoot` to the project’s `public` directory; enable `mod_rewrite` and the virtual-host include; map `gearzone.test` to `127.0.0.1` in the Windows hosts file; restart Apache; then visit [http://gearzone.test/home](http://gearzone.test/home). A ready-to-copy configuration is in the Vietnamese section above.
-
-For a quick fallback without Apache, run `php artisan serve`.
-
-### Development workflow & safeguards
-
-```text
-Migration → migrate → Model/Controller/Validation/Route → Blade UI
-→ npm run dev/build → php artisan test
-```
-
-- Use `npm run dev` during asset development and `npm run build` for optimized output.
-- Use `php artisan migrate` for schema updates; use `php artisan migrate:rollback` to reverse the latest batch.
-- `php artisan migrate:fresh` drops every table in the configured database. Use it only for disposable local data.
-- Keep `.env` private, validate input, use Eloquent/query binding rather than concatenated SQL, and keep business rules out of Blade views.
-- Keep source in UTF-8 and MySQL in `utf8mb4` for correct Vietnamese and Unicode text.
+Keep `.env` private. `migrate:fresh --seed` is for disposable local data only.
 
 ## License
 
-No project-specific license is currently declared. Add one before distributing or reusing the project outside its intended team.
+Composer skeleton is MIT. The app has no extra project license; add one before public reuse.
