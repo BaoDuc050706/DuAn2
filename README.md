@@ -1,9 +1,3 @@
-Exit code: 0
-Wall time: 0.4 seconds
-Output:
-Exit code: 0
-Wall time: 0.5 seconds
-Output:
 # GearZone
 
 > **VI** — Nền tảng web GearZone xây dựng bằng Laravel, định hướng giới thiệu và kinh doanh thiết bị công nghệ.
