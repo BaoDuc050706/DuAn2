@@ -1,4 +1,4 @@
-# GearZone (CAEKT Gear Store)
+# CAEKT Gear Store
 
 > **VI** — Website thương mại điện tử Laravel 12 bán laptop gaming, PC gear và phụ kiện (tai nghe, chuột, bàn phím, màn hình, loa). Có catalogue, giỏ hàng, đặt hàng, quản trị, chatbot tư vấn và dữ liệu mẫu.
 > **EN** — A Laravel 12 e-commerce store for gaming laptops and PC peripherals, with catalogue, cart, checkout, admin, a support chatbot, and seed data.
