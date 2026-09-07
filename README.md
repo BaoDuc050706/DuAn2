@@ -98,7 +98,7 @@ Kèm Laravel: `password_reset_tokens`, `sessions`.
 | --- | --- |
 | user_id | Nullable, `onDelete set null` |
 | order_number | Unique (`ORD` + timestamp + random) |
-| full_name, email, phone, address | Người nhận |
+| full_name, email, phone, address | Thông tin người nhận |
 | payment_method | `cod` \| `bank` \| `card` |
 | subtotal, shipping, total | Tiền |
 | status | `pending`, `processing`, `shipped`, `delivered`, `cancelled` |
